@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+const config = require('config');
 
-function connect(uri) {
-  mongoose.connect(uri, {
+function connect() {
+  mongoose.connect(config.get('ATLAS_URI'), {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
