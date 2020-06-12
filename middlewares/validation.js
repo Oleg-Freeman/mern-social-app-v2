@@ -1,5 +1,7 @@
 const Joi = require('@hapi/joi');
 const User = require('../models/user.model');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 module.exports = {
 
@@ -24,39 +26,56 @@ module.exports = {
   ensureAuthenticated: async(req, res, next) => {
     if (!req.headers.token) {
       console.log('Please log in to view that resource');
-      return res.status(400).json('Please log in to view that resource');
+      return res.status(401).json('Please log in to view that resource');
     }
     else {
-      await User.findById(req.headers.token)
-        .exec((err, user) => {
-          if (err) return res.status(400).json('Error: ' + err);
-          else if (user === null || user.length === 0) {
-            return res.status(400).json('User not found');
-          }
-          else if (!user.isAuthenticated) {
-            console.log('Please log in to view that resource');
-            return res.status(400).json('Please log in to view that resource');
-          }
-          else {
-            next();
-          }
-        });
+      try {
+        const token = req.headers.token.split(' ')[1];
+        const decoded = jwt.verify(token, config.get('JWT_SECRET'));
+
+        await User.findById(decoded)
+          .exec((err, user) => {
+            if (err) return res.status(401).json('Error: ' + err);
+            else if (user === null || user.length === 0) {
+              return res.status(401).json('User not found');
+            }
+            else if (!user.isAuthenticated) {
+              console.log('Please log in to view that resource');
+              return res.status(401).json('Please log in to view that resource');
+            }
+            else {
+              req.user = user;
+              next();
+            }
+          });
+      }
+      catch (e) {
+        if (e) return res.status(401).json('Auth error: ' + e);
+      }
     }
   },
 
   isloggedIn: async(req, res, next) => {
     if (req.headers.token) {
-      await User.findById(req.headers.token)
-        .exec((err, user) => {
-          if (err) return res.status(400).json('Error: ' + err);
-          if (user.isAuthenticated) {
-            console.log('User already logged in');
-            return res.json({ authenticated: true });
-          }
-          else {
-            next();
-          }
-        });
+      try {
+        const token = req.headers.token.split(' ')[1];
+        const decoded = jwt.verify(token, config.get('JWT_SECRET'));
+
+        await User.findById(decoded)
+          .exec((err, user) => {
+            if (err) return res.status(400).json('Error: ' + err);
+            if (user.isAuthenticated) {
+              console.log('User already logged in');
+              return res.json({ authenticated: true });
+            }
+            else {
+              next();
+            }
+          });
+      }
+      catch (e) {
+        if (e) return res.status(400).json('Error: ' + e);
+      }
     }
     else {
       next();
