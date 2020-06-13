@@ -4,10 +4,12 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDb = require('./db');
 const path = require('path');
-const config = require('config');
+
+// .env config
+require('dotenv').config({ path: './config/.env' });
 
 // Port number configuretion
-const port = config.get('PORT') || 5000;
+const port = process.env.PORT || 5000;
 
 // Connect DB
 connectDb();
@@ -34,10 +36,10 @@ app.use((err, req, res, next) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('build'));
+  app.use('/', express.static(path.join(__dirname, 'client', 'build')));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html')); // relative path
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html')); // relative path
   });
 }
 

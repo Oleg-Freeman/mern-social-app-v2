@@ -54,7 +54,7 @@ class Comments extends Component {
                       >
                         {userName}
                       </Typography>
-                      {isAuthenticated && currentUserId === userId ? (
+                      {isAuthenticated && currentUserId.replace(/['"]+/g, '') === userId ? (
                         <DeleteComment postId={postId} commentId={_id} />
                       ) : null}
                       <LikeCommentButton commentId={_id} postId={postId} />

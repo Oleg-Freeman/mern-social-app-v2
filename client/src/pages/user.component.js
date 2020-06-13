@@ -22,8 +22,9 @@ class User extends Component {
   componentDidMount() {
     const userId = this.props.match.params.userId;
     const postId = this.props.match.params.postId;
-    const baseURL = 'https://floating-eyrie-36313.herokuapp.com/';
+    const baseURL = 'https://mern-social-app-4234234.herokuapp.com/';
     // http://localhost:5000/
+    // https://mern-social-app-4234234.herokuapp.com/
 
     if (postId) this.setState({ postIdParam: postId });
 

@@ -4,7 +4,6 @@ const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const config = require('config');
 // Image upload
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -17,10 +16,13 @@ const {
   isloggedIn
 } = require('../middlewares/validation');
 
+// .env config
+require('dotenv').config({ path: './config/.env' });
+
 cloudinary.config({
-  cloud_name: config.get('CLOUD_NAME'),
-  api_key: config.get('CLOUD_API_KEY'),
-  api_secret: config.get('CLOUD_API_SECRET')
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
 });
 
 const storage = multer.diskStorage({
@@ -148,7 +150,7 @@ router.route('/login').post(isloggedIn, async(req, res) => {
 
               const token = jwt.sign(
                 { userId: user._id },
-                config.get('JWT_SECRET'),
+                process.env.JWT_SECRET,
                 { expiresIn: '1h' }
               );
 
@@ -235,7 +237,7 @@ router.route('/:id').delete(ensureAuthenticated, (req, res) => {
 // upload user profie image avatar
 router.route('/image').post(ensureAuthenticated, upload.single('image'), async(req, res) => { // ensureAuthenticated,
   try {
-    const userId = req.headers.token;
+    const userId = req.user._id;
     await cloudinary.uploader.upload(req.file.path, async(error, result) => {
       if (error) {
         return res.status(400).json('Error in image upload - ' + error);

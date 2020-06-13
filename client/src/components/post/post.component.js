@@ -63,7 +63,7 @@ class Post extends Component {
     const isAuthenticated = window.localStorage.getItem('token');
     const currentUserId = window.localStorage.getItem('currentUserId');
 
-    const deleteButton = isAuthenticated && currentUserId === userId ? (
+    const deleteButton = isAuthenticated && currentUserId.replace(/['"]+/g, '') === userId ? (
       <DeletePost postId={_id} />
     ) : null;
     return (

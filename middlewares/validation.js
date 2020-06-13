@@ -1,7 +1,9 @@
 const Joi = require('@hapi/joi');
 const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
-const config = require('config');
+
+// .env config
+require('dotenv').config({ path: './config/.env' });
 
 module.exports = {
 
@@ -30,10 +32,9 @@ module.exports = {
     }
     else {
       try {
-        const token = req.headers.token.split(' ')[1];
-        const decoded = jwt.verify(token, config.get('JWT_SECRET'));
+        const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET);
 
-        await User.findById(decoded)
+        await User.findById(decoded.userId)
           .exec((err, user) => {
             if (err) return res.status(401).json('Error: ' + err);
             else if (user === null || user.length === 0) {
@@ -58,10 +59,10 @@ module.exports = {
   isloggedIn: async(req, res, next) => {
     if (req.headers.token) {
       try {
-        const token = req.headers.token.split(' ')[1];
-        const decoded = jwt.verify(token, config.get('JWT_SECRET'));
+        // const token = req.headers.token.split(' ')[1];
+        const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET);
 
-        await User.findById(decoded)
+        await User.findById(decoded.userId)
           .exec((err, user) => {
             if (err) return res.status(400).json('Error: ' + err);
             if (user.isAuthenticated) {

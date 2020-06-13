@@ -33,8 +33,7 @@ router.route('/add').post(ensureAuthenticated, async(req, res) => {
     const { error } = bodyValidation(req.body);
     if (error) return res.status(400).json({ bodyValidationError: error.details[0].message });
     else {
-      const token = req.headers.token;
-      await User.findById(token)
+      await User.findById(req.user._id)
         .exec(async(err, user) => {
           if (err) return res.status(400).json('Error: ' + err);
           else if (user === null) return res.status(400).json('Internal error');

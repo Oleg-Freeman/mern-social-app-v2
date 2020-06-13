@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
-const User = require('../models/user.model');
 const { ensureAuthenticated, bodyValidation } = require('../middlewares/validation');
 
 // Get all comments from DB
@@ -43,41 +42,35 @@ router.route('/add/:postId').post(ensureAuthenticated, async(req, res) => {
   if (error) return res.status(400).json(error.details[0].message);
   else {
     try {
-      const token = req.headers.token;
-      await User.findById(token)
-        .exec(async(err, user) => {
+      const user = req.user;
+
+      await Post.findById(req.params.postId)
+        .exec(async(err, post) => {
           if (err) return res.status(400).json('Error: ' + err);
-          else if (user === null) return res.status(400).json('Internal error');
+          else if (post === null) return res.status(400).json('Internal error');
           else {
-            await Post.findById(req.params.postId)
-              .exec(async(err, post) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (post === null) return res.status(400).json('Internal error');
-                else {
-                  const userName = user.userName;
-                  const body = req.body.body;
-                  const postId = req.params.postId;
-                  const userId = user._id;
-                  const imageURL = user.imageURL;
+            const userName = user.userName;
+            const body = req.body.body;
+            const postId = req.params.postId;
+            const userId = user._id;
+            const imageURL = user.imageURL;
 
-                  const newComment = new Comment({
-                    postId,
-                    userId,
-                    userName,
-                    body,
-                    imageURL
-                  });
+            const newComment = new Comment({
+              postId,
+              userId,
+              userName,
+              body,
+              imageURL
+            });
 
-                  post.comments.unshift(newComment._id);
-                  post.commentCount = ++post.commentCount;
+            post.comments.unshift(newComment._id);
+            post.commentCount = ++post.commentCount;
 
-                  await post.save();
+            await post.save();
 
-                  await newComment.save(() => {
-                    res.json(newComment);
-                  });
-                }
-              });
+            await newComment.save(() => {
+              res.json(newComment);
+            });
           }
         });
     }

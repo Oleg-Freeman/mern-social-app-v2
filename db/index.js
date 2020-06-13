@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-const config = require('config');
+require('dotenv').config({ path: './config/.env' });
 
 function connect() {
-  mongoose.connect(config.get('ATLAS_URI'), {
+  mongoose.connect(process.env.ATLAS_URI, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,

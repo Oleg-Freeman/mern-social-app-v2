@@ -2,7 +2,6 @@ const router = require('express').Router();
 const Like = require('../models/like.model');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
-const User = require('../models/user.model');
 const { ensureAuthenticated } = require('../middlewares/validation');
 
 // Get all likes
@@ -23,49 +22,42 @@ router.route('/').get(async(req, res) => {
 // Like Post
 router.route('/add/:postId').get(ensureAuthenticated, async(req, res) => {
   try {
-    const token = req.headers.token;
-    await User.findById(token)
-      .exec(async(err, user) => {
+    const user = req.user;
+    await Like.findOne({
+      userId: user._id,
+      postId: req.params.postId,
+      likeType: 'post'
+    })
+      .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (user === null) return res.status(400).json('Internal error');
+        else if (liked !== null) {
+          return res.status(400).json(`User ${user.userName} is already liked this post`);
+        }
         else {
-          await Like.findOne({
-            userId: user._id,
-            postId: req.params.postId,
-            likeType: 'post'
-          })
-            .exec(async(err, liked) => {
+          await Post.findById(req.params.postId)
+            .exec(async(err, post) => {
               if (err) return res.status(400).json('Error: ' + err);
-              else if (liked !== null) {
-                return res.status(400).json(`User ${user.userName} is already liked this post`);
-              }
+              else if (post === null) return res.status(400).json('Internal error');
               else {
-                await Post.findById(req.params.postId)
-                  .exec(async(err, post) => {
-                    if (err) return res.status(400).json('Error: ' + err);
-                    else if (post === null) return res.status(400).json('Internal error');
-                    else {
-                      const userName = user.userName;
-                      const postId = req.params.postId;
-                      const userId = user._id;
-                      const likeType = 'post';
+                const userName = user.userName;
+                const postId = req.params.postId;
+                const userId = user._id;
+                const likeType = 'post';
 
-                      const newLike = new Like({
-                        postId,
-                        userName,
-                        userId,
-                        likeType
-                      });
+                const newLike = new Like({
+                  postId,
+                  userName,
+                  userId,
+                  likeType
+                });
 
-                      post.likes.unshift(newLike._id);
-                      post.likeCount = ++post.likeCount;
+                post.likes.unshift(newLike._id);
+                post.likeCount = ++post.likeCount;
 
-                      await post.save();
-                      await newLike.save(() => {
-                        res.json(newLike);
-                      });
-                    }
-                  });
+                await post.save();
+                await newLike.save(() => {
+                  res.json(newLike);
+                });
               }
             });
         }
@@ -79,9 +71,8 @@ router.route('/add/:postId').get(ensureAuthenticated, async(req, res) => {
 // Unlike post
 router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
   try {
-    const token = req.headers.token;
     await Like.findOneAndDelete({
-      userId: token,
+      userId: req.user._id,
       postId: req.params.postId,
       likeType: 'post'
     })
@@ -120,51 +111,45 @@ router.route('/:postId').delete(ensureAuthenticated, async(req, res) => {
 // Like comment
 router.route('/comments/add/:commentId').get(ensureAuthenticated, async(req, res) => {
   try {
-    const token = req.headers.token;
-    await User.findById(token)
-      .exec(async(err, user) => {
+    const user = req.user;
+
+    await Like.findOne({
+      userId: user._id,
+      commentId: req.params.commentId,
+      likeType: 'comment'
+    })
+      .exec(async(err, liked) => {
         if (err) return res.status(400).json('Error: ' + err);
-        else if (user === null) return res.status(400).json('Internal error');
+        else if (liked !== null) {
+          return res.status(400).json(`User ${user.userName} is already liked this comment`);
+        }
         else {
-          await Like.findOne({
-            userId: user._id,
-            commentId: req.params.commentId,
-            likeType: 'comment'
-          })
-            .exec(async(err, liked) => {
+          await Comment.findById(req.params.commentId)
+            .exec(async(err, comment) => {
               if (err) return res.status(400).json('Error: ' + err);
-              else if (liked !== null) {
-                return res.status(400).json(`User ${user.userName} is already liked this comment`);
-              }
+              else if (comment === null) return res.status(400).json('Internal error');
               else {
-                await Comment.findById(req.params.commentId)
-                  .exec(async(err, comment) => {
-                    if (err) return res.status(400).json('Error: ' + err);
-                    else if (comment === null) return res.status(400).json('Internal error');
-                    else {
-                      const userName = user.userName;
-                      const postId = comment.postId;
-                      const userId = user._id;
-                      const commentId = comment._id;
-                      const likeType = 'comment';
+                const userName = user.userName;
+                const postId = comment.postId;
+                const userId = user._id;
+                const commentId = comment._id;
+                const likeType = 'comment';
 
-                      const newLike = new Like({
-                        postId,
-                        userName,
-                        userId,
-                        commentId,
-                        likeType
-                      });
+                const newLike = new Like({
+                  postId,
+                  userName,
+                  userId,
+                  commentId,
+                  likeType
+                });
 
-                      comment.likes.unshift(newLike._id);
-                      comment.likeCount = ++comment.likeCount;
+                comment.likes.unshift(newLike._id);
+                comment.likeCount = ++comment.likeCount;
 
-                      await comment.save();
-                      await newLike.save(() => {
-                        res.json(newLike);
-                      });
-                    }
-                  });
+                await comment.save();
+                await newLike.save(() => {
+                  res.json(newLike);
+                });
               }
             });
         }
@@ -178,9 +163,8 @@ router.route('/comments/add/:commentId').get(ensureAuthenticated, async(req, res
 // Unlike comment
 router.route('/comments/:commentId').delete(ensureAuthenticated, async(req, res) => {
   try {
-    const token = req.headers.token;
     await Like.findOneAndDelete({
-      userId: token,
+      userId: req.user._id,
       commentId: req.params.commentId,
       likeType: 'comment'
     })
