@@ -16,9 +16,7 @@ import {
   UNLIKE_COMMENT
 } from '../types';
 import axios from 'axios';
-const baseURL = 'https://mern-social-app-4234234.herokuapp.com/';
-// http://localhost:5000/
-// https://mern-social-app-4234234.herokuapp.com/
+const baseURL = '/';
 
 // Get all posts
 export const getPosts = () => (dispatch) => {

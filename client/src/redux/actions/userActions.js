@@ -8,9 +8,7 @@ import {
   GET_USER_NOTIFICATIONS
 } from '../types';
 import axios from 'axios';
-const baseURL = 'https://mern-social-app-4234234.herokuapp.com/';
-// http://localhost:5000/
-// https://mern-social-app-4234234.herokuapp.com/
+const baseURL = '/';
 
 export const loginUser = (userData, history) => (dispatch) => {
   dispatch({ type: LOADING_UI });

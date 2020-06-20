@@ -19,29 +19,28 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Static folder for front end
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
 // Routes
 app.use('/users', require('./routes/users'));
 app.use('/posts', require('./routes/posts'));
 app.use('/comments', require('./routes/comments'));
 app.use('/likes', require('./routes/likes'));
 
-app.use((req, res, next) => {
-  res.json('Page not found');
+app.get('/*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
 });
+
+// app.use((req, res, next) => {
+//   res.json('Page not found');
+// });
 
 app.use((err, req, res, next) => {
   if (err) {
     res.status(500).json('Internal server error');
   }
 });
-
-if (process.env.NODE_ENV === 'production') {
-  app.use('/', express.static(path.join(__dirname, 'client', 'build')));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html')); // relative path
-  });
-}
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
