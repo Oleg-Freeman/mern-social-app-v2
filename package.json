@@ -2,10 +2,6 @@
   "name": "social_back_end",
   "version": "2.0.0",
   "description": "Sosial network app",
-  "engines": {
-    "node": "12.12.0",
-    "npm": "6.11.3"
-  },
   "repository": {
     "url": "https://github.com/Oleg-Freeman/mern-social-app-v2"
   },
