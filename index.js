@@ -24,16 +24,12 @@ app.use('/posts', require('./routes/posts'));
 app.use('/comments', require('./routes/comments'));
 app.use('/likes', require('./routes/likes'));
 
-// app.use((req, res, next) => {
-//   res.json('Page not found');
-// });
-
 app.use((err, req, res, next) => {
-  if (err) {
-    res.status(500).json('Internal server error');
-  }
+    if (err) {
+        res.status(500).json('Internal server error');
+    }
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
+    console.log(`Server is running on port: ${port}`);
 });
