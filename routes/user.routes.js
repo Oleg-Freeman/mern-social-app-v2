@@ -18,12 +18,13 @@ const {
     registerUser,
     loginUser,
     logoutUser,
+    findUserById,
 } = require('../services/user.service');
 const { validateRequest, checkAuth } = require('../middlewares');
 const {
     registerUserSchema,
     loginUserSchema,
-    // idSchema,
+    idSchema,
 } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 
@@ -106,29 +107,20 @@ router.route('/logout').get(checkAuth, async (req, res, next) => {
 });
 
 // Get one user by ID
-router.route('/:id').get(async (req, res) => {
-    try {
-        await User.findById(req.params.id)
-            .select('-password -__v')
-            .populate({
-                path: 'posts',
-                populate: {
-                    path: 'comments likes',
-                    populate: {
-                        path: 'likes',
-                    },
-                },
-            })
-            .exec((err, user) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (user === null)
-                    return res.status(400).json('Error: user not found');
-                else return res.json(user);
-            });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
-    }
-});
+router
+    .route('/:id')
+    .get(
+        validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+        async (req, res, next) => {
+            try {
+                const user = await findUserById(req.params.id);
+
+                res.json(user);
+            } catch (error) {
+                next(error);
+            }
+        }
+    );
 
 // Delete user
 router.route('/:id').delete(

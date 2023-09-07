@@ -66,9 +66,30 @@ const logoutUser = async (user) => {
     await User.updateOne({ _id: user._id }, { $unset: { token: 1 } });
 };
 
+const findUserById = async (id) => {
+    const user = await User.findById(id)
+        .select('-password -__v -token')
+        .populate({
+            path: 'posts',
+            populate: {
+                path: 'comments likes',
+                populate: {
+                    path: 'likes',
+                },
+            },
+        });
+
+    if (!user) {
+        throw new CustomError(404, 'User not found');
+    }
+
+    return user;
+};
+
 module.exports = {
     findAllUsers,
     registerUser,
     loginUser,
     logoutUser,
+    findUserById,
 };
