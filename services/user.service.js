@@ -91,6 +91,12 @@ const deleteUser = async (id) => {
     await User.findByIdAndDelete(id);
 };
 
+const updateUser = async (user, data) => {
+    return User.findByIdAndUpdate(user._id, data, { new: true }).select(
+        '-password -__v -token'
+    );
+};
+
 module.exports = {
     findAllUsers,
     registerUser,
@@ -98,4 +104,5 @@ module.exports = {
     logoutUser,
     findUserById,
     deleteUser,
+    updateUser,
 };
