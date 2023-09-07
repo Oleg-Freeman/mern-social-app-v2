@@ -16,6 +16,7 @@ All components are in the `client/src` folder. All another files was generated b
 
 This project requires next enviroment variables:
 
+    - SKIP_PREFLIGHT_CHECK=true
     - PORT - Node server port number
     - ATLAS_URI - MongoDB access
     - CLOUD_NAME - image hosting

@@ -3,12 +3,11 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDb = require('./db');
-const path = require('path');
 
 // .env config
-require('dotenv').config({ path: './config/.env' });
+require('dotenv').config();
 
-// Port number configuretion
+// Port number configuration
 const port = process.env.PORT || 5000;
 
 // Connect DB
@@ -19,18 +18,11 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Static folder for front end
-app.use(express.static(path.join(__dirname, 'client', 'build')));
-
 // Routes
 app.use('/users', require('./routes/users'));
 app.use('/posts', require('./routes/posts'));
 app.use('/comments', require('./routes/comments'));
 app.use('/likes', require('./routes/likes'));
-
-app.get('/*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-});
 
 // app.use((req, res, next) => {
 //   res.json('Page not found');

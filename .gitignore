@@ -25,3 +25,8 @@
 .env.production.local
 
 npm-debug.log*
+.vercel
+
+# IDE
+.idea
+.vscode
