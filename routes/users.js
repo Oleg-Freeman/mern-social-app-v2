@@ -2,7 +2,7 @@ const router = require('express').Router();
 const User = require('../models/user.model');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 // Image upload
 const multer = require('multer');
