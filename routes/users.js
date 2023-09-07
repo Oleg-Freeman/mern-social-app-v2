@@ -8,13 +8,14 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 // Validations
-const {
-    registerValidation,
-    ensureAuthenticated,
-    loginValidation,
-    userDetailsValidation,
-    isloggedIn,
-} = require('../middlewares/validation');
+// const {
+//     registerValidation,
+//     ensureAuthenticated,
+//     loginValidation,
+//     userDetailsValidation,
+//     isloggedIn,
+// } = require('../middlewares/validation.middleware');
+const { findAllUsers } = require('../services/user.service');
 
 // .env config
 require('dotenv').config({ path: './config/.env' });
@@ -43,63 +44,42 @@ const upload = multer({ storage, fileFilter: imageFilter });
 
 // Get all users from DB
 router.route('/').get(async (req, res) => {
-    try {
-        await User.find()
-            .select('-password -__v')
-            .sort({ createdAt: -1 })
-            .populate({
-                path: 'posts',
-                populate: {
-                    path: 'comments likes',
-                    populate: {
-                        path: 'likes',
-                    },
-                },
-            })
-            .exec((err, users) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (users === null || users.length === 0)
-                    return res
-                        .status(400)
-                        .json('No any registered users found');
-                else return res.json(users);
-            });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
-    }
+    const users = await findAllUsers();
+
+    res.json(users);
 });
 
 // Register new user
-router.route('/register').post(isloggedIn, async (req, res) => {
+router.route('/register').post(async (req, res) => {
     const { email, password, userName } = req.body;
 
     // Validate data
-    const { error } = registerValidation(req.body);
+    // const { error } = registerValidation(req.body);
 
-    if (error && error.details[0].path[0] === 'email') {
-        return res.status(400).json({
-            email: error.details[0].message,
-            message: 'Wrong credentials, try again',
-        });
-    }
-    if (error && error.details[0].path[0] === 'password') {
-        return res.status(400).json({
-            password: error.details[0].message,
-            message: 'Wrong credentials, try again',
-        });
-    }
-    if (error && error.details[0].path[0] === 'password2') {
-        return res.status(400).json({
-            password2: 'Confirm password do not match',
-            message: 'Wrong credentials, try again',
-        });
-    }
-    if (error && error.details[0].path[0] === 'userName') {
-        return res.status(400).json({
-            userName: error.details[0].message,
-            message: 'Wrong credentials, try again',
-        });
-    }
+    // if (error && error.details[0].path[0] === 'email') {
+    //     return res.status(400).json({
+    //         email: error.details[0].message,
+    //         message: 'Wrong credentials, try again',
+    //     });
+    // }
+    // if (error && error.details[0].path[0] === 'password') {
+    //     return res.status(400).json({
+    //         password: error.details[0].message,
+    //         message: 'Wrong credentials, try again',
+    //     });
+    // }
+    // if (error && error.details[0].path[0] === 'password2') {
+    //     return res.status(400).json({
+    //         password2: 'Confirm password do not match',
+    //         message: 'Wrong credentials, try again',
+    //     });
+    // }
+    // if (error && error.details[0].path[0] === 'userName') {
+    //     return res.status(400).json({
+    //         userName: error.details[0].message,
+    //         message: 'Wrong credentials, try again',
+    //     });
+    // }
 
     // Check if User Exists in DB
     const emailExist = await User.findOne({ email: req.body.email });
@@ -120,20 +100,20 @@ router.route('/register').post(isloggedIn, async (req, res) => {
 });
 
 // Login
-router.route('/login').post(isloggedIn, async (req, res) => {
-    const { error } = loginValidation(req.body);
-    if (error && error.details[0].path[0] === 'email') {
-        return res.status(400).json({
-            email: error.details[0].message,
-            message: 'Wrong credentials, try again',
-        });
-    }
-    if (error && error.details[0].path[0] === 'password') {
-        return res.status(400).json({
-            password: error.details[0].message,
-            message: 'Wrong credentials, try again',
-        });
-    }
+router.route('/login').post(async (req, res) => {
+    // const { error } = loginValidation(req.body);
+    // if (error && error.details[0].path[0] === 'email') {
+    //     return res.status(400).json({
+    //         email: error.details[0].message,
+    //         message: 'Wrong credentials, try again',
+    //     });
+    // }
+    // if (error && error.details[0].path[0] === 'password') {
+    //     return res.status(400).json({
+    //         password: error.details[0].message,
+    //         message: 'Wrong credentials, try again',
+    //     });
+    // }
     try {
         await User.findOne({ email: req.body.email }).exec(
             async (err, user) => {
@@ -229,73 +209,78 @@ router.route('/:id').get(async (req, res) => {
 });
 
 // Delete user
-router.route('/:id').delete(ensureAuthenticated, (req, res) => {
-    try {
-        User.findByIdAndDelete(req.params.id).exec((err, user) => {
-            if (err) return res.status(400).json('Error: ' + err);
-            else if (user === null)
-                return res.status(400).json('Error: user not found');
-            else return res.json('User deleted');
-        });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
+router.route('/:id').delete(
+    /* ensureAuthenticated, */ (req, res) => {
+        try {
+            User.findByIdAndDelete(req.params.id).exec((err, user) => {
+                if (err) return res.status(400).json('Error: ' + err);
+                else if (user === null)
+                    return res.status(400).json('Error: user not found');
+                else return res.json('User deleted');
+            });
+        } catch (err) {
+            res.status(400).json('Error: ' + err);
+        }
     }
-});
+);
 
 // upload user profie image avatar
 router
     .route('/image')
-    .post(ensureAuthenticated, upload.single('image'), async (req, res) => {
-        // ensureAuthenticated,
-        try {
-            const userId = req.user._id;
-            await cloudinary.uploader.upload(
-                req.file.path,
-                async (error, result) => {
-                    if (error) {
-                        return res
-                            .status(400)
-                            .json('Error in image upload - ' + error);
-                    } else {
-                        await User.findOneAndUpdate(
-                            { _id: userId },
-                            { imageURL: result.secure_url }
-                        );
-                        // .exec((err, user) => {
-                        //   if (err) return res.status(400).json('Error: ' + err);
-                        //   if (user === null) return res.status(400).json('User Not found');
-                        // });
-                        await Post.updateMany(
-                            { userId },
-                            { imageURL: result.secure_url }
-                        );
-                        // .exec((err, posts) => {
-                        //   if (err) return res.status(400).json('Error: ' + err);
-                        //   if (posts.nModified === 0) return res.status(400).json('Post Not found');
-                        // });
-                        await Comment.updateMany(
-                            { userId },
-                            { imageURL: result.secure_url }
-                        );
-                        // .exec((err, comments) => {
-                        //   if (err) return res.status(400).json('Error: ' + err);
-                        //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
-                        // });
-                        return res.json('Image uploaded');
+    .post(
+        /* ensureAuthenticated, */ upload.single('image'),
+        async (req, res) => {
+            try {
+                const userId = req.user._id;
+                await cloudinary.uploader.upload(
+                    req.file.path,
+                    async (error, result) => {
+                        if (error) {
+                            return res
+                                .status(400)
+                                .json('Error in image upload - ' + error);
+                        } else {
+                            await User.findOneAndUpdate(
+                                { _id: userId },
+                                { imageURL: result.secure_url }
+                            );
+                            // .exec((err, user) => {
+                            //   if (err) return res.status(400).json('Error: ' + err);
+                            //   if (user === null) return res.status(400).json('User Not found');
+                            // });
+                            await Post.updateMany(
+                                { userId },
+                                { imageURL: result.secure_url }
+                            );
+                            // .exec((err, posts) => {
+                            //   if (err) return res.status(400).json('Error: ' + err);
+                            //   if (posts.nModified === 0) return res.status(400).json('Post Not found');
+                            // });
+                            await Comment.updateMany(
+                                { userId },
+                                { imageURL: result.secure_url }
+                            );
+                            // .exec((err, comments) => {
+                            //   if (err) return res.status(400).json('Error: ' + err);
+                            //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
+                            // });
+                            return res.json('Image uploaded');
+                        }
                     }
-                }
-            );
-        } catch (err) {
-            res.status(400).json('Error: ' + err);
+                );
+            } catch (err) {
+                res.status(400).json('Error: ' + err);
+            }
         }
-    });
+    );
 
 // Add user details
-router.route('/update/:id').post(ensureAuthenticated, async (req, res) => {
-    try {
-        const { error } = userDetailsValidation(req.body);
-        if (error) return res.status(400).json(error.details[0].message);
-        else {
+router.route('/update/:id').post(
+    /* ensureAuthenticated, */ async (req, res) => {
+        try {
+            // const { error } = userDetailsValidation(req.body);
+            // if (error) return res.status(400).json(error.details[0].message);
+            // else {
             await User.findById(req.params.id).exec(async (err, user) => {
                 if (err) return res.status(400).json('Error: ' + err);
                 else if (user === null)
@@ -332,10 +317,11 @@ router.route('/update/:id').post(ensureAuthenticated, async (req, res) => {
                     });
                 }
             });
+            // }
+        } catch (err) {
+            res.status(400).json('Error: ' + err);
         }
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
     }
-});
+);
 
 module.exports = router;
