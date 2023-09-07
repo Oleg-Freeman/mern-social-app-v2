@@ -86,10 +86,16 @@ const findUserById = async (id) => {
     return user;
 };
 
+// TODO: delete all user related data
+const deleteUser = async (id) => {
+    await User.findByIdAndDelete(id);
+};
+
 module.exports = {
     findAllUsers,
     registerUser,
     loginUser,
     logoutUser,
     findUserById,
+    deleteUser,
 };

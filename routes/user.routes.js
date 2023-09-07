@@ -19,6 +19,7 @@ const {
     loginUser,
     logoutUser,
     findUserById,
+    deleteUser,
 } = require('../services/user.service');
 const { validateRequest, checkAuth } = require('../middlewares');
 const {
@@ -123,20 +124,15 @@ router
     );
 
 // Delete user
-router.route('/:id').delete(
-    /* ensureAuthenticated, */ (req, res) => {
-        try {
-            User.findByIdAndDelete(req.params.id).exec((err, user) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (user === null)
-                    return res.status(400).json('Error: user not found');
-                else return res.json('User deleted');
-            });
-        } catch (err) {
-            res.status(400).json('Error: ' + err);
-        }
+router.route('/').delete(checkAuth, async (req, res, next) => {
+    try {
+        await deleteUser(req.user._id);
+
+        res.status(204).end();
+    } catch (error) {
+        next(error);
     }
-);
+});
 
 // upload user profie image avatar
 router
