@@ -1,13 +1,14 @@
 // noinspection ExceptionCaughtLocallyJS
 
 const { CustomError } = require('../utils');
+const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 
 module.exports = (schema, target) => (req, res, next) => {
     try {
         let errors = [];
 
         switch (target) {
-            case 'body': {
+            case REQUEST_VALIDATION_TARGETS.BODY: {
                 const { error } = schema.validate(req.body);
 
                 if (error) {
@@ -17,7 +18,7 @@ module.exports = (schema, target) => (req, res, next) => {
                 break;
             }
 
-            case 'path': {
+            case REQUEST_VALIDATION_TARGETS.PATH: {
                 Object.values(req.params).forEach((value) => {
                     const { error } = schema.validate(value);
 

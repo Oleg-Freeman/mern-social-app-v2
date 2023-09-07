@@ -24,9 +24,15 @@ app.use('/posts', require('./routes/posts'));
 app.use('/comments', require('./routes/comments'));
 app.use('/likes', require('./routes/likes'));
 
-app.use((err, req, res, next) => {
-    if (err) {
-        res.status(500).json('Internal server error');
+app.use((error, req, res, next) => {
+    const status = error.status || 500;
+    const message = error.message || 'Internal server error';
+    const { method, originalUrl } = req;
+
+    console.error(`Error ${status} ${method} ${originalUrl} - `, error.message);
+
+    if (error) {
+        res.status(status).json({ message, method, path: originalUrl });
     }
 });
 
