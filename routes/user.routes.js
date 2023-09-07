@@ -2,8 +2,6 @@ const router = require('express').Router();
 const User = require('../models/user.model');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 // Image upload
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -15,13 +13,19 @@ const cloudinary = require('cloudinary').v2;
 //     userDetailsValidation,
 //     isloggedIn,
 // } = require('../middlewares/validation.middleware');
-const { findAllUsers, registerUser } = require('../services/user.service');
-const { validateRequest } = require('../middlewares');
-const { registerUserSchema } = require('../validation');
+const {
+    findAllUsers,
+    registerUser,
+    loginUser,
+    logoutUser,
+} = require('../services/user.service');
+const { validateRequest, checkAuth } = require('../middlewares');
+const {
+    registerUserSchema,
+    loginUserSchema,
+    // idSchema,
+} = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
-
-// .env config
-require('dotenv').config({ path: './config/.env' });
 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -75,86 +79,29 @@ router
     );
 
 // Login
-router.route('/login').post(async (req, res) => {
-    // const { error } = loginValidation(req.body);
-    // if (error && error.details[0].path[0] === 'email') {
-    //     return res.status(400).json({
-    //         email: error.details[0].message,
-    //         message: 'Wrong credentials, try again',
-    //     });
-    // }
-    // if (error && error.details[0].path[0] === 'password') {
-    //     return res.status(400).json({
-    //         password: error.details[0].message,
-    //         message: 'Wrong credentials, try again',
-    //     });
-    // }
-    try {
-        await User.findOne({ email: req.body.email }).exec(
-            async (err, user) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (user === null || user.length === 0)
-                    return res.status(400).json('Wrong credentials, try again');
-                else if (user.isAuthenticated === true)
-                    return res.json(user._id);
-                else {
-                    // Match password
-                    await bcrypt.compare(
-                        req.body.password,
-                        user.password,
-                        async (err, isMatch) => {
-                            if (err) {
-                                console.log(err);
-                                return res.status(400).json('Error: ' + err);
-                            }
-                            if (isMatch) {
-                                user.isAuthenticated = true;
+router
+    .route('/login')
+    .post(
+        validateRequest(loginUserSchema, REQUEST_VALIDATION_TARGETS.BODY),
+        async (req, res, next) => {
+            try {
+                const result = await loginUser(req.body);
 
-                                const token = jwt.sign(
-                                    { userId: user._id },
-                                    process.env.JWT_SECRET,
-                                    { expiresIn: '1h' }
-                                );
-
-                                await user.save(() => {
-                                    res.json({
-                                        userId: user._id,
-                                        token,
-                                    });
-                                });
-                            } else {
-                                return res
-                                    .status(400)
-                                    .json('Wrong credentials, try again');
-                            }
-                        }
-                    );
-                }
+                res.json(result);
+            } catch (error) {
+                next(error);
             }
-        );
-    } catch (err) {
-        console.log(err);
-    }
-});
+        }
+    );
 
 // Logout
-router.route('/logout/:id').get(async (req, res) => {
+router.route('/logout').get(checkAuth, async (req, res, next) => {
     try {
-        await User.findById(req.params.id).exec(async (err, user) => {
-            if (err) return res.status(400).json('Error: ' + err);
-            else if (user === null || user.length === 0)
-                return res.status(400).json('User not found');
-            else if (user.isAuthenticated === false)
-                return res.json({ notAuthenticated: true });
-            else {
-                user.isAuthenticated = false;
-                await user.save(() => {
-                    res.json({ loggedOut: true });
-                });
-            }
-        });
+        await logoutUser(req.user);
+
+        res.status(204).end();
     } catch (err) {
-        console.log(err);
+        next(err);
     }
 });
 

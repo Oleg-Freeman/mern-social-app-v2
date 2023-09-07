@@ -30,6 +30,7 @@ const userSchema = new Schema(
         website: { type: String },
         location: { type: String },
         postCount: {
+            // TODO: remove this field
             type: Number,
             required: true,
             default: 0,
@@ -44,6 +45,10 @@ const userSchema = new Schema(
             type: Boolean,
             required: true,
             default: false,
+        },
+        token: {
+            type: String,
+            required: false,
         },
     },
     {

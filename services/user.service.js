@@ -1,10 +1,11 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const { CustomError } = require('../utils');
+const jwt = require('jsonwebtoken');
 
 const findAllUsers = async () => {
     return User.find()
-        .select('-password -__v')
+        .select('-password -__v -token')
         .sort({ createdAt: -1 })
         .populate({
             path: 'posts',
@@ -24,16 +25,50 @@ const registerUser = async ({ email, password, userName }) => {
         throw new CustomError(400, 'Email already exists');
     }
 
-    const newUserData = { email, password, userName };
-
     // Hash password
     const salt = await bcrypt.genSalt(10);
-    newUserData.password = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    return User.create(newUserData);
+    const newUser = await User.create({
+        email,
+        password: hashedPassword,
+        userName,
+    });
+
+    return User.findById(newUser._id, '-password -__v');
+};
+
+const loginUser = async ({ email, password }) => {
+    let user = await User.findOne({ email });
+
+    if (!user) {
+        throw new CustomError(400, 'Wrong credentials, try again');
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+        throw new CustomError(400, 'Wrong credentials, try again');
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '1h',
+    });
+
+    await User.updateOne({ _id: user._id }, { $set: { token } });
+
+    user = await User.findById(user._id, '-password -__v');
+
+    return { user, token };
+};
+
+const logoutUser = async (user) => {
+    await User.updateOne({ _id: user._id }, { $unset: { token: 1 } });
 };
 
 module.exports = {
     findAllUsers,
     registerUser,
+    loginUser,
+    logoutUser,
 };
