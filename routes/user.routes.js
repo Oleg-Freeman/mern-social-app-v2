@@ -1,10 +1,4 @@
 const router = require('express').Router();
-const User = require('../models/user.model');
-const Comment = require('../models/comment.model');
-const Post = require('../models/post.model');
-// Image upload
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
 const {
     findAllUsers,
     registerUser,
@@ -13,6 +7,7 @@ const {
     findUserById,
     deleteUser,
     updateUser,
+    uploadUserAvatar,
 } = require('../services/user.service');
 const { validateRequest, checkAuth } = require('../middlewares');
 const {
@@ -22,28 +17,7 @@ const {
     updateUserSchema,
 } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
-
-cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET,
-});
-
-const storage = multer.diskStorage({
-    filename: function (req, file, callback) {
-        callback(null, Date.now() + '_image');
-    },
-});
-
-const imageFilter = function (req, file, cb) {
-    // accept image files only
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-        return cb(new Error('Only image files are allowed!'), false);
-    }
-    cb(null, true);
-};
-
-const upload = multer({ storage, fileFilter: imageFilter });
+const { imageUpload } = require('../utils');
 
 // Get all users from DB
 router.route('/').get(async (req, res, next) => {
@@ -128,50 +102,16 @@ router.route('/').delete(checkAuth, async (req, res, next) => {
     }
 });
 
-// upload user profie image avatar
+// upload user profile image avatar
 router
     .route('/image')
-    .post(checkAuth, upload.single('image'), async (req, res) => {
+    .post(checkAuth, imageUpload.single('image'), async (req, res, next) => {
         try {
-            const userId = req.user._id;
-            await cloudinary.uploader.upload(
-                req.file.path,
-                async (error, result) => {
-                    if (error) {
-                        return res
-                            .status(400)
-                            .json('Error in image upload - ' + error);
-                    } else {
-                        await User.findOneAndUpdate(
-                            { _id: userId },
-                            { imageURL: result.secure_url }
-                        );
-                        // .exec((err, user) => {
-                        //   if (err) return res.status(400).json('Error: ' + err);
-                        //   if (user === null) return res.status(400).json('User Not found');
-                        // });
-                        await Post.updateMany(
-                            { userId },
-                            { imageURL: result.secure_url }
-                        );
-                        // .exec((err, posts) => {
-                        //   if (err) return res.status(400).json('Error: ' + err);
-                        //   if (posts.nModified === 0) return res.status(400).json('Post Not found');
-                        // });
-                        await Comment.updateMany(
-                            { userId },
-                            { imageURL: result.secure_url }
-                        );
-                        // .exec((err, comments) => {
-                        //   if (err) return res.status(400).json('Error: ' + err);
-                        //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
-                        // });
-                        return res.json('Image uploaded');
-                    }
-                }
-            );
-        } catch (err) {
-            res.status(400).json('Error: ' + err);
+            await uploadUserAvatar(req.user, req.file);
+
+            res.status(204).end();
+        } catch (error) {
+            next(error);
         }
     });
 

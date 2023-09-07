@@ -2,6 +2,13 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const { CustomError } = require('../utils');
 const jwt = require('jsonwebtoken');
+const { v2: cloudinary } = require('cloudinary');
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET,
+});
 
 const findAllUsers = async () => {
     return User.find()
@@ -57,7 +64,7 @@ const loginUser = async ({ email, password }) => {
 
     await User.updateOne({ _id: user._id }, { $set: { token } });
 
-    user = await User.findById(user._id, '-password -__v');
+    user = await User.findById(user._id, '-password -__v -token');
 
     return { user, token };
 };
@@ -97,6 +104,14 @@ const updateUser = async (user, data) => {
     );
 };
 
+const uploadUserAvatar = async (user, file) => {
+    const { secure_url: imageURL } = await cloudinary.uploader.upload(
+        file.path
+    );
+
+    await User.findOneAndUpdate({ _id: user._id }, { imageURL });
+};
+
 module.exports = {
     findAllUsers,
     registerUser,
@@ -105,4 +120,5 @@ module.exports = {
     findUserById,
     deleteUser,
     updateUser,
+    uploadUserAvatar,
 };
