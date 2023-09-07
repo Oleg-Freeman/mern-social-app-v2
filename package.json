@@ -7,7 +7,6 @@
   },
   "author": {
     "name": "Oleg Voitiuk",
-    "email": "av.ssf4@gmail.com",
     "url": "https://linkedin.com/in/olegv999"
   },
   "main": "server.js",
@@ -15,7 +14,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "lint": "./node_modules/.bin/eslint ."
+    "lint": "./node_modules/.bin/eslint . --fix"
   },
   "devDependencies": {
     "eslint": "^7.3.0",
