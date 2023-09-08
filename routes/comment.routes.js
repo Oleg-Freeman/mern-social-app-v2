@@ -6,23 +6,6 @@ const { postBodySchema, idSchema } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 const { addComment } = require('../services/comment.service');
 
-// Get all comments from DB
-router.get('/', async (req, res) => {
-    try {
-        await Comment.find()
-            .sort({ createdAt: -1 })
-            .populate('likes')
-            .exec((err, comments) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (comments === null || comments.length === 0)
-                    return res.status(400).json('No any comments found');
-                else return res.json(comments);
-            });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
-    }
-});
-
 // Get all comments on post
 router.get('/:postId', async (req, res) => {
     try {
@@ -65,8 +48,10 @@ router.post(
 
 // Delete comment
 router.delete(
-    '/:commentId',
-    /* ensureAuthenticated, */ async (req, res) => {
+    '/:id',
+    checkAuth,
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    async (req, res) => {
         try {
             await Comment.findByIdAndDelete(req.params.commentId).exec(
                 async (err, comment) => {
@@ -115,12 +100,12 @@ router.delete(
 );
 
 // Update comment
-router.post(
-    '/update/:commentId',
-    /* ensureAuthenticated, */ async (req, res) => {
-        // const { error } = bodyValidation(req.body);
-        // if (error) return res.status(400).json(error.details[0].message);
-        // else {
+router.put(
+    '/:id',
+    checkAuth,
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
+    async (req, res) => {
         try {
             await Comment.findOneAndUpdate(
                 { _id: req.params.commentId },
