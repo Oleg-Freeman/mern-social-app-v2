@@ -4,32 +4,25 @@ const Like = require('../models/like.model');
 const Comment = require('../models/comment.model');
 const User = require('../models/user.model');
 const { validateRequest, checkAuth } = require('../middlewares');
-const { postBodySchema } = require('../validation');
+const { postBodySchema, paginationSchema } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
-const { addPost } = require('../services/post.service');
+const { addPost, getAllPosts } = require('../services/post.service');
 
-// TODO: add pagination
 // Get all posts
-router.route('/').get(async (req, res) => {
-    try {
-        await Post.find()
-            .sort({ createdAt: -1 })
-            .populate({
-                path: 'comments likes',
-                populate: {
-                    path: 'likes',
-                },
-            })
-            .exec((err, posts) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (posts === null)
-                    return res.status(400).json('No any posts found');
-                else return res.json(posts);
-            });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
-    }
-});
+router
+    .route('/')
+    .get(
+        validateRequest(paginationSchema, REQUEST_VALIDATION_TARGETS.QUERY),
+        async (req, res, next) => {
+            try {
+                const posts = await getAllPosts(req.query);
+
+                res.json(posts);
+            } catch (error) {
+                next(error);
+            }
+        }
+    );
 
 // Add new post
 router

@@ -29,13 +29,11 @@ module.exports = (schema, target) => (req, res, next) => {
                 break;
             }
             case REQUEST_VALIDATION_TARGETS.QUERY: {
-                Object.values(req.query).forEach((value) => {
-                    const { error } = schema.validate(value);
+                const { error } = schema.validate(req.query);
 
-                    if (error) {
-                        errors = errors.concat(error.details);
-                    }
-                });
+                if (error) {
+                    errors = errors.concat(error.details);
+                }
 
                 break;
             }

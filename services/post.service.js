@@ -12,6 +12,21 @@ const addPost = async (data, user) => {
     return post;
 };
 
+const getAllPosts = async ({ skip = 0, limit = 100 }) => {
+    return Post.find()
+        .sort({ createdAt: -1 })
+        .limit(+limit)
+        .skip(+skip)
+        .populate({
+            // TODO: nested pagination
+            path: 'comments likes',
+            populate: {
+                path: 'likes',
+            },
+        });
+};
+
 module.exports = {
     addPost,
+    getAllPosts,
 };
