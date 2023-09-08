@@ -1,8 +1,5 @@
 const router = require('express').Router();
 const Post = require('../models/post.model');
-const Like = require('../models/like.model');
-const Comment = require('../models/comment.model');
-const User = require('../models/user.model');
 const { validateRequest, checkAuth } = require('../middlewares');
 const { postBodySchema, paginationSchema, idSchema } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
@@ -10,6 +7,7 @@ const {
     addPost,
     getAllPosts,
     getPostById,
+    deletePost,
 } = require('../services/post.service');
 
 // Get all posts
@@ -59,48 +57,20 @@ router.get(
 );
 
 // Delete one post
-router.delete('/:id', checkAuth, async (req, res) => {
-    try {
-        await Post.findByIdAndDelete(req.params.id).exec(async (err, post) => {
-            if (err) return res.status(400).json('Error: ' + err);
-            else if (post === null)
-                return res.status(400).json('Post not found');
-            else {
-                await Like.deleteMany({ postId: post._id });
-                // .exec((err, likes) => {
-                //   if (err) return res.status(400).json('Error: ' + err);
-                //   if (likes.nModified === 0) return res.status(400).json('Likes Not found');
-                // });
-                await Comment.deleteMany({ postId: post._id });
-                // .exec((err, comments) => {
-                //   if (err) return res.status(400).json('Error: ' + err);
-                //   if (comments.nModified === 0) return res.status(400).json('Comments Not found');
-                // });
-                await User.findById(post.userId).exec(async (err, user) => {
-                    if (err) return res.status(400).json('Error: ' + err);
-                    else if (user === null)
-                        return res.status(400).json('Internal error');
-                    else {
-                        const toDelete = user.posts.findIndex((deleteMe) => {
-                            return deleteMe.toString() === req.params.id;
-                        });
-                        if (toDelete === -1)
-                            return res.status(400).json('Post not found');
-                        else {
-                            user.postCount = --user.postCount;
-                            user.posts.splice(toDelete, 1);
-                            await user.save(() => {
-                                res.json('Post deleted');
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
+router.delete(
+    '/:id',
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    checkAuth,
+    async (req, res, next) => {
+        try {
+            await deletePost(req.params.id, req.user);
+
+            res.status(204).end();
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
 
 // Update Post
 router.put('/:id', checkAuth, async (req, res) => {

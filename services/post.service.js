@@ -1,6 +1,8 @@
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
 const { CustomError } = require('../utils');
+const Like = require('../models/like.model');
+const Comment = require('../models/comment.model');
 const addPost = async (data, user) => {
     const post = await Post.create({ ...data, userId: user._id });
 
@@ -42,8 +44,32 @@ const getPostById = async (id) => {
     return post;
 };
 
+const deletePost = async (id, user) => {
+    const post = await getPostById(id);
+
+    if (post.userId.toString() !== user._id.toString()) {
+        throw new CustomError(403, 'Forbidden');
+    }
+
+    await Post.findByIdAndDelete(id);
+    await User.findByIdAndUpdate(user._id, {
+        $pullAll: {
+            posts: [id],
+        },
+    });
+
+    // TODO: test this
+    if (post.likes && post.likes.length > 0) {
+        await Like.deleteMany({ _id: { $in: post.likes } });
+    }
+    if (post.comments && post.comments.length > 0) {
+        await Comment.deleteMany({ _id: { $in: post.comments } });
+    }
+};
+
 module.exports = {
     addPost,
     getAllPosts,
     getPostById,
+    deletePost,
 };
