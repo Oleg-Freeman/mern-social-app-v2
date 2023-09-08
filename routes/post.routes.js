@@ -4,9 +4,13 @@ const Like = require('../models/like.model');
 const Comment = require('../models/comment.model');
 const User = require('../models/user.model');
 const { validateRequest, checkAuth } = require('../middlewares');
-const { postBodySchema, paginationSchema } = require('../validation');
+const { postBodySchema, paginationSchema, idSchema } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
-const { addPost, getAllPosts } = require('../services/post.service');
+const {
+    addPost,
+    getAllPosts,
+    getPostById,
+} = require('../services/post.service');
 
 // Get all posts
 router.get(
@@ -40,25 +44,19 @@ router.post(
 );
 
 // Get one post by ID
-router.get('/:id', async (req, res) => {
-    try {
-        await Post.findById(req.params.id)
-            .populate({
-                path: 'comments likes',
-                populate: {
-                    path: 'likes',
-                },
-            })
-            .exec((err, post) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (post === null)
-                    return res.status(400).json('No any posts found');
-                else return res.json(post);
-            });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
+router.get(
+    '/:id',
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    async (req, res, next) => {
+        try {
+            const post = await getPostById(req.params.id);
+
+            res.json(post);
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
 
 // Delete one post
 router.delete('/:id', checkAuth, async (req, res) => {

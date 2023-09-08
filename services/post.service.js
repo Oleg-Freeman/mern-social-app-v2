@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
+const { CustomError } = require('../utils');
 const addPost = async (data, user) => {
     const post = await Post.create({ ...data, userId: user._id });
 
@@ -26,7 +27,23 @@ const getAllPosts = async ({ skip = 0, limit = 100 }) => {
         });
 };
 
+const getPostById = async (id) => {
+    const post = await Post.findById(id).populate({
+        path: 'comments likes',
+        populate: {
+            path: 'likes',
+        },
+    });
+
+    if (!post) {
+        throw new CustomError(404, 'Post not found');
+    }
+
+    return post;
+};
+
 module.exports = {
     addPost,
     getAllPosts,
+    getPostById,
 };
