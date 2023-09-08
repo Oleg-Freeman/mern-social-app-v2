@@ -17,7 +17,6 @@ module.exports = (schema, target) => (req, res, next) => {
 
                 break;
             }
-
             case REQUEST_VALIDATION_TARGETS.PATH: {
                 Object.values(req.params).forEach((value) => {
                     const { error } = schema.validate(value);
@@ -29,7 +28,17 @@ module.exports = (schema, target) => (req, res, next) => {
 
                 break;
             }
+            case REQUEST_VALIDATION_TARGETS.QUERY: {
+                Object.values(req.query).forEach((value) => {
+                    const { error } = schema.validate(value);
 
+                    if (error) {
+                        errors = errors.concat(error.details);
+                    }
+                });
+
+                break;
+            }
             default:
                 throw new CustomError(500, 'Unknown target');
         }

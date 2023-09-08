@@ -23,14 +23,15 @@ const userSchema = new Schema(
         imageURL: {
             type: String,
             required: true,
+            // TODO: move to environment variables
             default:
                 'https://res.cloudinary.com/freeman999/image/upload/v1589014461/noAvatar2_skj96w.png',
         },
         bio: { type: String },
         website: { type: String },
         location: { type: String },
+        // TODO: remove this field
         postCount: {
-            // TODO: remove this field
             type: Number,
             required: true,
             default: 0,
@@ -38,9 +39,16 @@ const userSchema = new Schema(
         posts: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Posts',
+                ref: 'Post',
             },
         ],
+        comments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Comment',
+            },
+        ],
+        // TODO: remove this field
         isAuthenticated: {
             type: Boolean,
             required: true,

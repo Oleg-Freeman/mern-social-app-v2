@@ -16,20 +16,24 @@ const commentSchema = new Schema(
             type: String,
             required: true,
         },
+        // TODO: remove this field
         userName: {
             type: String,
             required: true,
         },
+        // TODO: remove this field
         likeCount: {
             type: Number,
             required: true,
             default: 0,
         },
+        // TODO: remove this field
         commentCount: {
             type: Number,
             required: true,
             default: 0,
         },
+        // TODO: remove this field
         imageURL: {
             type: String,
             required: true,
@@ -39,16 +43,16 @@ const commentSchema = new Schema(
         likes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Likes',
+                ref: 'Like',
             },
         ],
-        // TO DO: Comments on comments
+        // TODO: Reply to comment
     },
     {
         timestamps: true,
     }
 );
 
-const Comment = mongoose.model('Comments', commentSchema);
+const Comment = mongoose.model('Comment', commentSchema);
 
 module.exports = Comment;

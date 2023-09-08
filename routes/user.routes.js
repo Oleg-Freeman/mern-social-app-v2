@@ -19,6 +19,7 @@ const {
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 const { imageUpload } = require('../utils');
 
+// TODO: add pagination
 // Get all users from DB
 router.route('/').get(async (req, res, next) => {
     try {

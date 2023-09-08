@@ -4,9 +4,10 @@ const Schema = mongoose.Schema;
 
 const postSchema = new Schema(
     {
+        // TODO: remove this field
         userName: {
             type: String,
-            required: true,
+            required: false,
         },
         userId: {
             type: String,
@@ -16,32 +17,35 @@ const postSchema = new Schema(
             type: String,
             required: true,
         },
+        // TODO: remove this field
         likeCount: {
             type: Number,
             required: true,
             default: 0,
         },
+        // TODO: remove this field
         commentCount: {
             type: Number,
             required: true,
             default: 0,
         },
+        // TODO: remove this field
         imageURL: {
             type: String,
-            required: true,
+            required: false,
             default:
                 'https://res.cloudinary.com/freeman999/image/upload/v1589014461/noAvatar2_skj96w.png',
         },
         comments: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Comments',
+                ref: 'Comment',
             },
         ],
         likes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Likes',
+                ref: 'Like',
             },
         ],
     },
@@ -50,6 +54,6 @@ const postSchema = new Schema(
     }
 );
 
-const Post = mongoose.model('Posts', postSchema);
+const Post = mongoose.model('Post', postSchema);
 
 module.exports = Post;

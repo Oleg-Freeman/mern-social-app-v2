@@ -15,12 +15,14 @@ const likeSchema = new Schema(
             type: String,
             required: true,
         },
+        // TODO: remove this field
         userName: {
             type: String,
             required: true,
         },
         likeType: {
             type: String,
+            // TODO: move to constants
             enum: ['post', 'comment'],
             required: true,
         },
@@ -30,6 +32,6 @@ const likeSchema = new Schema(
     }
 );
 
-const Like = mongoose.model('Likes', likeSchema);
+const Like = mongoose.model('Like', likeSchema);
 
 module.exports = Like;
