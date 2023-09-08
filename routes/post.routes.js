@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const Post = require('../models/post.model');
 const { validateRequest, checkAuth } = require('../middlewares');
 const { postBodySchema, paginationSchema, idSchema } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
@@ -8,6 +7,7 @@ const {
     getAllPosts,
     getPostById,
     deletePost,
+    updatePost,
 } = require('../services/post.service');
 
 // Get all posts
@@ -59,8 +59,8 @@ router.get(
 // Delete one post
 router.delete(
     '/:id',
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
     checkAuth,
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
     async (req, res, next) => {
         try {
             await deletePost(req.params.id, req.user);
@@ -73,27 +73,20 @@ router.delete(
 );
 
 // Update Post
-router.put('/:id', checkAuth, async (req, res) => {
-    try {
-        await Post.findById(req.params.id).exec(async (err, post) => {
-            if (err) return res.status(400).json('Error: ' + err);
-            else if (post === null)
-                return res.status(400).json('Post not found');
-            else {
-                // const { error } = bodyValidation(req.body);
-                // if (error)
-                //     return res.status(400).json(error.details[0].message);
+router.put(
+    '/:id',
+    checkAuth,
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
+    async (req, res, next) => {
+        try {
+            const post = await updatePost(req.params.id, req.body, req.user);
 
-                post.body = req.body.body;
-
-                await post.save(() => {
-                    res.json('Post updated!');
-                });
-            }
-        });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
+            res.json(post);
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
 
 module.exports = router;

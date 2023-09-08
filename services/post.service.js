@@ -44,10 +44,14 @@ const getPostById = async (id) => {
     return post;
 };
 
+const checkPostOwner = (post, user) => {
+    return post.userId.toString() === user._id.toString();
+};
+
 const deletePost = async (id, user) => {
     const post = await getPostById(id);
 
-    if (post.userId.toString() !== user._id.toString()) {
+    if (!checkPostOwner(post, user)) {
         throw new CustomError(403, 'Forbidden');
     }
 
@@ -67,9 +71,20 @@ const deletePost = async (id, user) => {
     }
 };
 
+const updatePost = async (id, data, user) => {
+    const post = await getPostById(id);
+
+    if (!checkPostOwner(post, user)) {
+        throw new CustomError(403, 'Forbidden');
+    }
+
+    return Post.findByIdAndUpdate(id, data, { new: true });
+};
+
 module.exports = {
     addPost,
     getAllPosts,
     getPostById,
     deletePost,
+    updatePost,
 };
