@@ -104,6 +104,7 @@ const updateUser = async (user, data) => {
     );
 };
 
+// TODO: delete old avatar
 const uploadUserAvatar = async (user, file) => {
     const { secure_url: imageURL } = await cloudinary.uploader.upload(
         file.path

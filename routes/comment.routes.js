@@ -7,7 +7,7 @@ const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 const { addComment } = require('../services/comment.service');
 
 // Get all comments on post
-router.get('/:postId', async (req, res) => {
+router.get('/:postId', async (req, res, next) => {
     try {
         await Comment.find({ postId: req.param.postId })
             .sort({ createdAt: -1 })
@@ -20,8 +20,8 @@ router.get('/:postId', async (req, res) => {
                         .json('No any comments on this post found');
                 else return res.json(comments);
             });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
+    } catch (error) {
+        next(error);
     }
 });
 
@@ -51,7 +51,7 @@ router.delete(
     '/:id',
     checkAuth,
     validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
-    async (req, res) => {
+    async (req, res, next) => {
         try {
             await Comment.findByIdAndDelete(req.params.commentId).exec(
                 async (err, comment) => {
@@ -93,8 +93,8 @@ router.delete(
                     }
                 }
             );
-        } catch (err) {
-            res.status(400).json('Error: ' + err);
+        } catch (error) {
+            next(error);
         }
     }
 );
@@ -105,7 +105,7 @@ router.put(
     checkAuth,
     validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
     validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
-    async (req, res) => {
+    async (req, res, next) => {
         try {
             await Comment.findOneAndUpdate(
                 { _id: req.params.commentId },
@@ -116,10 +116,9 @@ router.put(
                     return res.status(400).json('Comment not found');
                 else return res.json('Comment updated!');
             });
-        } catch (err) {
-            res.status(400).json('Error: ' + err);
+        } catch (error) {
+            next(error);
         }
-        // }
     }
 );
 

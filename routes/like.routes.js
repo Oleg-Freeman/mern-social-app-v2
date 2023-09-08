@@ -2,28 +2,21 @@ const router = require('express').Router();
 const Like = require('../models/like.model');
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
-// const { ensureAuthenticated } = require('../middlewares/validation.middleware');
+const { validateRequest, checkAuth } = require('../middlewares');
+const { idSchema } = require('../validation');
+const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 
-// Get all likes
-router.get('/', async (req, res) => {
-    try {
-        await Like.find()
-            .sort({ createdAt: -1 })
-            .exec((err, likes) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (likes === null || likes.length === 0)
-                    return res.status(400).json('No any likes found');
-                else return res.json(likes);
-            });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
-    }
-});
+// TODO: get all user likes
 
+// TODO: merge with unlike post
+// TODO: merge with unlike comment
+// TODO: add like type required param
 // Like Post
-router.get(
-    '/add/:postId',
-    /* ensureAuthenticated, */ async (req, res) => {
+router.put(
+    '/posts/:postId',
+    checkAuth,
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    async (req, res, next) => {
         try {
             const user = req.user;
             await Like.findOne({
@@ -70,13 +63,13 @@ router.get(
                     );
                 }
             });
-        } catch (err) {
-            res.status(400).json('Error: ' + err);
+        } catch (error) {
+            next(error);
         }
     }
 );
 
-// Unlike post
+// TODO: remove Unlike post
 router.delete(
     '/:postId',
     /* ensureAuthenticated, */ async (req, res) => {
@@ -129,9 +122,9 @@ router.delete(
     }
 );
 
-// Like comment
-router.get(
-    '/comments/add/:commentId',
+// TODO: remove Like comment
+router.put(
+    '/comments/:commentId',
     /* ensureAuthenticated, */ async (req, res) => {
         try {
             const user = req.user;
@@ -188,7 +181,7 @@ router.get(
     }
 );
 
-// Unlike comment
+// TODO: remove Unlike comment
 router.delete(
     '/comments/:commentId',
     /* ensureAuthenticated, */ async (req, res) => {
