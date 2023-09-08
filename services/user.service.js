@@ -15,7 +15,7 @@ const findAllUsers = async () => {
         .select('-password -__v -token')
         .sort({ createdAt: -1 })
         .populate({
-            path: 'posts',
+            path: 'posts comments likes',
             populate: {
                 path: 'comments likes',
                 populate: {
@@ -77,7 +77,7 @@ const findUserById = async (id) => {
     const user = await User.findById(id)
         .select('-password -__v -token')
         .populate({
-            path: 'posts',
+            path: 'posts comments likes',
             populate: {
                 path: 'comments likes',
                 populate: {

@@ -19,7 +19,7 @@ const commentSchema = new Schema(
         // TODO: remove this field
         userName: {
             type: String,
-            required: true,
+            required: false,
         },
         // TODO: remove this field
         likeCount: {

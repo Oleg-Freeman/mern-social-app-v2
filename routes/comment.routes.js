@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const Comment = require('../models/comment.model');
 const Post = require('../models/post.model');
-// const {
-//     ensureAuthenticated,
-//     bodyValidation,
-// } = require('../middlewares/validation.middleware');
+const { validateRequest, checkAuth } = require('../middlewares');
+const { postBodySchema, idSchema } = require('../validation');
+const { REQUEST_VALIDATION_TARGETS } = require('../constants');
+const { addComment } = require('../services/comment.service');
 
 // Get all comments from DB
 router.get('/', async (req, res) => {
@@ -44,47 +44,22 @@ router.get('/:postId', async (req, res) => {
 
 // Add new comment
 router.post(
-    '/add/:postId',
-    /* ensureAuthenticated, */ async (req, res) => {
-        // const { error } = bodyValidation(req.body);
-        // if (error) return res.status(400).json(error.details[0].message);
-        // else {
+    '/:postId',
+    checkAuth,
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
+    async (req, res, next) => {
         try {
-            const user = req.user;
+            const comment = await addComment(
+                req.params.postId,
+                req.body,
+                req.user
+            );
 
-            await Post.findById(req.params.postId).exec(async (err, post) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (post === null)
-                    return res.status(400).json('Internal error');
-                else {
-                    const userName = user.userName;
-                    const body = req.body.body;
-                    const postId = req.params.postId;
-                    const userId = user._id;
-                    const imageURL = user.imageURL;
-
-                    const newComment = new Comment({
-                        postId,
-                        userId,
-                        userName,
-                        body,
-                        imageURL,
-                    });
-
-                    post.comments.unshift(newComment._id);
-                    post.commentCount = ++post.commentCount;
-
-                    await post.save();
-
-                    await newComment.save(() => {
-                        res.json(newComment);
-                    });
-                }
-            });
-        } catch (err) {
-            res.status(400).json('Error: ' + err);
+            res.status(201).json(comment);
+        } catch (error) {
+            next(error);
         }
-        // }
     }
 );
 
