@@ -5,7 +5,7 @@ const Post = require('../models/post.model');
 // const { ensureAuthenticated } = require('../middlewares/validation.middleware');
 
 // Get all likes
-router.route('/').get(async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         await Like.find()
             .sort({ createdAt: -1 })
@@ -21,7 +21,8 @@ router.route('/').get(async (req, res) => {
 });
 
 // Like Post
-router.route('/add/:postId').get(
+router.get(
+    '/add/:postId',
     /* ensureAuthenticated, */ async (req, res) => {
         try {
             const user = req.user;
@@ -76,7 +77,8 @@ router.route('/add/:postId').get(
 );
 
 // Unlike post
-router.route('/:postId').delete(
+router.delete(
+    '/:postId',
     /* ensureAuthenticated, */ async (req, res) => {
         try {
             await Like.findOneAndDelete({
@@ -128,7 +130,8 @@ router.route('/:postId').delete(
 );
 
 // Like comment
-router.route('/comments/add/:commentId').get(
+router.get(
+    '/comments/add/:commentId',
     /* ensureAuthenticated, */ async (req, res) => {
         try {
             const user = req.user;
@@ -186,7 +189,8 @@ router.route('/comments/add/:commentId').get(
 );
 
 // Unlike comment
-router.route('/comments/:commentId').delete(
+router.delete(
+    '/comments/:commentId',
     /* ensureAuthenticated, */ async (req, res) => {
         try {
             await Like.findOneAndDelete({

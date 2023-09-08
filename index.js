@@ -21,8 +21,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Routes
 app.use('/users', require('./routes/user.routes'));
 app.use('/posts', require('./routes/post.routes'));
-app.use('/comments', require('./routes/comments'));
-app.use('/likes', require('./routes/likes'));
+app.use('/comments', require('./routes/comment.routes'));
+app.use('/likes', require('./routes/like.routes'));
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;

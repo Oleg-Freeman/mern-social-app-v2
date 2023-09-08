@@ -7,7 +7,7 @@ const Post = require('../models/post.model');
 // } = require('../middlewares/validation.middleware');
 
 // Get all comments from DB
-router.route('/').get(async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         await Comment.find()
             .sort({ createdAt: -1 })
@@ -24,7 +24,7 @@ router.route('/').get(async (req, res) => {
 });
 
 // Get all comments on post
-router.route('/:postId').get(async (req, res) => {
+router.get('/:postId', async (req, res) => {
     try {
         await Comment.find({ postId: req.param.postId })
             .sort({ createdAt: -1 })
@@ -43,7 +43,8 @@ router.route('/:postId').get(async (req, res) => {
 });
 
 // Add new comment
-router.route('/add/:postId').post(
+router.post(
+    '/add/:postId',
     /* ensureAuthenticated, */ async (req, res) => {
         // const { error } = bodyValidation(req.body);
         // if (error) return res.status(400).json(error.details[0].message);
@@ -88,7 +89,8 @@ router.route('/add/:postId').post(
 );
 
 // Delete comment
-router.route('/:commentId').delete(
+router.delete(
+    '/:commentId',
     /* ensureAuthenticated, */ async (req, res) => {
         try {
             await Comment.findByIdAndDelete(req.params.commentId).exec(
@@ -138,7 +140,8 @@ router.route('/:commentId').delete(
 );
 
 // Update comment
-router.route('/update/:commentId').post(
+router.post(
+    '/update/:commentId',
     /* ensureAuthenticated, */ async (req, res) => {
         // const { error } = bodyValidation(req.body);
         // if (error) return res.status(400).json(error.details[0].message);

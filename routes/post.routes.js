@@ -9,40 +9,38 @@ const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 const { addPost, getAllPosts } = require('../services/post.service');
 
 // Get all posts
-router
-    .route('/')
-    .get(
-        validateRequest(paginationSchema, REQUEST_VALIDATION_TARGETS.QUERY),
-        async (req, res, next) => {
-            try {
-                const posts = await getAllPosts(req.query);
+router.get(
+    '/',
+    validateRequest(paginationSchema, REQUEST_VALIDATION_TARGETS.QUERY),
+    async (req, res, next) => {
+        try {
+            const posts = await getAllPosts(req.query);
 
-                res.json(posts);
-            } catch (error) {
-                next(error);
-            }
+            res.json(posts);
+        } catch (error) {
+            next(error);
         }
-    );
+    }
+);
 
 // Add new post
-router
-    .route('/')
-    .post(
-        checkAuth,
-        validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
-        async (req, res, next) => {
-            try {
-                const post = await addPost(req.body, req.user);
+router.post(
+    '/',
+    checkAuth,
+    validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
+    async (req, res, next) => {
+        try {
+            const post = await addPost(req.body, req.user);
 
-                res.status(201).json(post);
-            } catch (error) {
-                next(error);
-            }
+            res.status(201).json(post);
+        } catch (error) {
+            next(error);
         }
-    );
+    }
+);
 
 // Get one post by ID
-router.route('/:id').get(async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         await Post.findById(req.params.id)
             .populate({
@@ -63,7 +61,7 @@ router.route('/:id').get(async (req, res) => {
 });
 
 // Delete one post
-router.route('/:id').delete(checkAuth, async (req, res) => {
+router.delete('/:id', checkAuth, async (req, res) => {
     try {
         await Post.findByIdAndDelete(req.params.id).exec(async (err, post) => {
             if (err) return res.status(400).json('Error: ' + err);
@@ -107,7 +105,7 @@ router.route('/:id').delete(checkAuth, async (req, res) => {
 });
 
 // Update Post
-router.route('/:id').put(checkAuth, async (req, res) => {
+router.put('/:id', checkAuth, async (req, res) => {
     try {
         await Post.findById(req.params.id).exec(async (err, post) => {
             if (err) return res.status(400).json('Error: ' + err);
