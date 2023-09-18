@@ -16,30 +16,6 @@ const commentSchema = new Schema(
             type: String,
             required: true,
         },
-        // TODO: remove this field
-        userName: {
-            type: String,
-            required: false,
-        },
-        // TODO: remove this field
-        likeCount: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        // TODO: remove this field
-        commentCount: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        // TODO: remove this field
-        imageURL: {
-            type: String,
-            required: true,
-            default:
-                'https://res.cloudinary.com/freeman999/image/upload/v1589014461/noAvatar2_skj96w.png',
-        },
         // TODO: Reply to comment
     },
     {
@@ -58,6 +34,12 @@ commentSchema.virtual('likes', {
 commentSchema.virtual('user', {
     ref: 'User',
     localField: 'userId',
+    foreignField: '_id',
+    justOne: true,
+});
+commentSchema.virtual('post', {
+    ref: 'Post',
+    localField: 'postId',
     foreignField: '_id',
     justOne: true,
 });
