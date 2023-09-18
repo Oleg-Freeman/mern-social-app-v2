@@ -11,18 +11,21 @@ cloudinary.config({
 });
 
 const findAllUsers = async () => {
-    return User.find()
-        .select('-password -__v -token')
-        .sort({ createdAt: -1 })
-        .populate({
-            path: 'posts comments likes',
-            populate: {
-                path: 'comments likes',
+    return (
+        User.find()
+            .select('-password -__v -token')
+            .sort({ createdAt: -1 })
+            // TODO: test deep populate
+            .populate({
+                path: 'posts comments likes',
                 populate: {
-                    path: 'likes',
+                    path: 'comments likes',
+                    populate: {
+                        path: 'likes',
+                    },
                 },
-            },
-        });
+            })
+    );
 };
 
 const registerUser = async ({ email, password, userName }) => {

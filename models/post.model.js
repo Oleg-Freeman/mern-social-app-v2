@@ -4,11 +4,6 @@ const Schema = mongoose.Schema;
 
 const postSchema = new Schema(
     {
-        // TODO: remove this field
-        userName: {
-            type: String,
-            required: false,
-        },
         userId: {
             type: String,
             required: true,
@@ -36,23 +31,32 @@ const postSchema = new Schema(
             default:
                 'https://res.cloudinary.com/freeman999/image/upload/v1589014461/noAvatar2_skj96w.png',
         },
-        comments: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Comment',
-            },
-        ],
-        likes: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Like',
-            },
-        ],
     },
     {
         timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
     }
 );
+
+postSchema.virtual('user', {
+    ref: 'User',
+    localField: 'userId',
+    foreignField: '_id',
+    justOne: true,
+});
+postSchema.virtual('likes', {
+    ref: 'Like',
+    localField: '_id',
+    foreignField: 'postId',
+    justOne: false,
+});
+postSchema.virtual('comments', {
+    ref: 'Comment',
+    localField: '_id',
+    foreignField: 'postId',
+    justOne: false,
+});
 
 const Post = mongoose.model('Post', postSchema);
 

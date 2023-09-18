@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 
 const likeSchema = new Schema(
     {
+        // TODO: at least one field is required
         postId: {
             type: String,
-            required: true,
         },
         commentId: {
             type: String,

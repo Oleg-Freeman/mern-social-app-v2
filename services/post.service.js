@@ -22,7 +22,7 @@ const getAllPosts = async ({ skip = 0, limit = 100 }) => {
         .skip(+skip)
         .populate({
             // TODO: nested pagination
-            path: 'comments likes',
+            path: 'user comments likes',
             populate: {
                 path: 'likes',
             },
