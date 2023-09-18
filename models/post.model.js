@@ -12,25 +12,6 @@ const postSchema = new Schema(
             type: String,
             required: true,
         },
-        // TODO: remove this field
-        likeCount: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        // TODO: remove this field
-        commentCount: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        // TODO: remove this field
-        imageURL: {
-            type: String,
-            required: false,
-            default:
-                'https://res.cloudinary.com/freeman999/image/upload/v1589014461/noAvatar2_skj96w.png',
-        },
     },
     {
         timestamps: true,

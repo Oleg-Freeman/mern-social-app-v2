@@ -1,18 +1,12 @@
-const User = require('../models/user.model');
 const Post = require('../models/post.model');
 const { CustomError } = require('../utils');
-const Like = require('../models/like.model');
-const Comment = require('../models/comment.model');
 const addPost = async (data, user) => {
     const post = await Post.create({ ...data, userId: user._id });
 
-    await User.findByIdAndUpdate(user._id, {
-        $push: {
-            posts: post._id,
-        },
+    return Post.findById(post._id).populate({
+        path: 'user',
+        select: '-password -__v',
     });
-
-    return post;
 };
 
 const getAllPosts = async ({ skip = 0, limit = 100 }) => {
@@ -56,19 +50,6 @@ const deletePost = async (id, user) => {
     }
 
     await Post.findByIdAndDelete(id);
-    await User.findByIdAndUpdate(user._id, {
-        $pullAll: {
-            posts: [id],
-        },
-    });
-
-    // TODO: test this
-    if (post.likes && post.likes.length > 0) {
-        await Like.deleteMany({ _id: { $in: post.likes } });
-    }
-    if (post.comments && post.comments.length > 0) {
-        await Comment.deleteMany({ _id: { $in: post.comments } });
-    }
 };
 
 const updatePost = async (id, data, user) => {
