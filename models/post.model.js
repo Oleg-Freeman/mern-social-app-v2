@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const DB_MODELS = require('../constants/db-models');
 
 const Schema = mongoose.Schema;
 
@@ -21,24 +22,24 @@ const postSchema = new Schema(
 );
 
 postSchema.virtual('user', {
-    ref: 'User',
+    ref: DB_MODELS.USER,
     localField: 'userId',
     foreignField: '_id',
     justOne: true,
 });
 postSchema.virtual('likes', {
-    ref: 'Like',
+    ref: DB_MODELS.LIKE,
     localField: '_id',
     foreignField: 'postId',
     justOne: false,
 });
 postSchema.virtual('comments', {
-    ref: 'Comment',
+    ref: DB_MODELS.COMMENT,
     localField: '_id',
     foreignField: 'postId',
     justOne: false,
 });
 
-const Post = mongoose.model('Post', postSchema);
+const Post = mongoose.model(DB_MODELS.POST, postSchema);
 
 module.exports = Post;

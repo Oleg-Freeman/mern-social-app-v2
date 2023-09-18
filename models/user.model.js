@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const DB_MODELS = require('../constants/db-models');
 
 const Schema = mongoose.Schema;
 
@@ -31,18 +32,6 @@ const userSchema = new Schema(
         bio: { type: String },
         website: { type: String },
         location: { type: String },
-        // TODO: remove this field
-        postCount: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        // TODO: remove this field
-        isAuthenticated: {
-            type: Boolean,
-            required: true,
-            default: false,
-        },
         token: {
             type: String,
             required: false,
@@ -56,24 +45,24 @@ const userSchema = new Schema(
 );
 
 userSchema.virtual('posts', {
-    ref: 'Post',
+    ref: DB_MODELS.POST,
     localField: '_id',
     foreignField: 'userId',
     justOne: false,
 });
 userSchema.virtual('comments', {
-    ref: 'Comment',
+    ref: DB_MODELS.COMMENT,
     localField: '_id',
     foreignField: 'userId',
     justOne: false,
 });
 userSchema.virtual('likes', {
-    ref: 'Like',
+    ref: DB_MODELS.LIKE,
     localField: '_id',
     foreignField: 'userId',
     justOne: false,
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model(DB_MODELS.USER, userSchema);
 
 module.exports = User;

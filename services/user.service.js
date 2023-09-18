@@ -12,12 +12,6 @@ const findAllUsers = async () => {
             // TODO: test deep populate
             .populate({
                 path: 'posts comments likes',
-                populate: {
-                    path: 'comments likes',
-                    populate: {
-                        path: 'likes',
-                    },
-                },
             })
     );
 };
@@ -75,12 +69,13 @@ const findUserById = async (id) => {
         .select('-password -__v -token')
         .populate({
             path: 'posts comments likes',
-            populate: {
-                path: 'comments likes',
-                populate: {
-                    path: 'likes',
-                },
-            },
+            // TODO: replace with aggregation. Virtuals cannot be populated
+            // populate: {
+            //     path: 'comments likes',
+            //     populate: {
+            //         path: 'likes',
+            //     },
+            // },
         });
 
     if (!user) {

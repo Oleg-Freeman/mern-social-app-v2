@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const DB_MODELS = require('../constants/db-models');
 
 const Schema = mongoose.Schema;
 
@@ -32,6 +33,6 @@ const likeSchema = new Schema(
     }
 );
 
-const Like = mongoose.model('Like', likeSchema);
+const Like = mongoose.model(DB_MODELS.LIKE, likeSchema);
 
 module.exports = Like;
