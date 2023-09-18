@@ -1,7 +1,7 @@
 const CustomError = require('./custom-error');
-const imageUpload = require('./image-upload');
+const imageUploader = require('./image-uploader');
 
 module.exports = {
     CustomError,
-    imageUpload,
+    imageUploader,
 };

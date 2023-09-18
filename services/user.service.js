@@ -2,13 +2,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const { CustomError } = require('../utils');
 const jwt = require('jsonwebtoken');
-const { v2: cloudinary } = require('cloudinary');
-
-cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET,
-});
+const { imageUploader } = require('../utils');
 
 const findAllUsers = async () => {
     return (
@@ -109,9 +103,7 @@ const updateUser = async (user, data) => {
 
 // TODO: delete old avatar
 const uploadUserAvatar = async (user, file) => {
-    const { secure_url: imageURL } = await cloudinary.uploader.upload(
-        file.path
-    );
+    const imageURL = await imageUploader.upload(file.path);
 
     await User.findOneAndUpdate({ _id: user._id }, { imageURL });
 };

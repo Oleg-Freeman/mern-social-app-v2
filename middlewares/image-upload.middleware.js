@@ -1,4 +1,5 @@
 const multer = require('multer');
+
 const imageFilter = function (req, file, cb) {
     // accept image files only
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
@@ -13,6 +14,6 @@ const storage = multer.diskStorage({
     },
 });
 
-const upload = multer({ storage, fileFilter: imageFilter });
+const imageUpload = multer({ storage, fileFilter: imageFilter });
 
-module.exports = upload;
+module.exports = imageUpload;

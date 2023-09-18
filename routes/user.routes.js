@@ -9,7 +9,7 @@ const {
     updateUser,
     uploadUserAvatar,
 } = require('../services/user.service');
-const { validateRequest, checkAuth } = require('../middlewares');
+const { validateRequest, checkAuth, imageUpload } = require('../middlewares');
 const {
     registerUserSchema,
     loginUserSchema,
@@ -17,7 +17,6 @@ const {
     updateUserSchema,
 } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
-const { imageUpload } = require('../utils');
 
 // TODO: add pagination
 // Get all users from DB
