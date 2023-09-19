@@ -25,17 +25,12 @@ const userSchema = new Schema(
         imageURL: {
             type: String,
             required: true,
-            // TODO: move to environment variables
-            default:
-                'https://res.cloudinary.com/freeman999/image/upload/v1589014461/noAvatar2_skj96w.png',
+            default: process.env.DEFAULT_USER_AVATAR,
         },
         bio: { type: String },
         website: { type: String },
         location: { type: String },
-        token: {
-            type: String,
-            required: false,
-        },
+        token: { type: String },
     },
     {
         timestamps: true,

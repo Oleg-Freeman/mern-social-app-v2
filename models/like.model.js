@@ -6,15 +6,14 @@ const Schema = mongoose.Schema;
 
 const likeSchema = new Schema(
     {
-        // TODO: at least one field is required
         postId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
         },
         commentId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
         },
         userId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
         },
         likeType: {
@@ -47,6 +46,7 @@ likeSchema.virtual('comment', {
     foreignField: '_id',
     justOne: true,
 });
+likeSchema.index({ postId: 1, commentId: 1, userId: 1 }, { unique: true });
 
 const Like = mongoose.model(DB_MODELS.LIKE, likeSchema);
 
