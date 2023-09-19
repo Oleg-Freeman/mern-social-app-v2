@@ -1,6 +1,6 @@
 module.exports = {
     async up(db) {
-        await db.collection('posts').updateMany(
+        await db.collection('comments').updateMany(
             { _id: { $exists: true } },
             {
                 $unset: {
@@ -8,7 +8,6 @@ module.exports = {
                     likeCount: 1,
                     commentCount: 1,
                     imageURL: 1,
-                    comments: 1,
                     likes: 1,
                 },
             }
@@ -16,19 +15,15 @@ module.exports = {
     },
 
     async down(db) {
-        const posts = await db.collection('posts').find().toArray();
+        const comments = await db.collection('comments').find().toArray();
 
-        for (const post of posts) {
+        for (const comment of comments) {
             const user = await db
                 .collection('users')
-                .findOne({ _id: post.userId });
-            const comments = await db
-                .collection('comments')
-                .find({ postId: post._id })
-                .toArray();
+                .findOne({ _id: comment.userId });
             const likes = await db
                 .collection('likes')
-                .find({ postId: post._id })
+                .find({ commentId: comment._id })
                 .toArray();
             const update = { $set: {} };
 
@@ -36,18 +31,14 @@ module.exports = {
                 update.$set.userName = user.userName;
                 update.$set.imageURL = user.imageURL;
             }
-            if (comments?.length) {
-                update.$set.comments = comments.map((comment) => comment._id);
-                update.$set.commentCount = comments.length;
-            }
             if (likes?.length) {
                 update.$set.likes = likes.map((like) => like._id);
                 update.$set.likeCount = likes.length;
             }
             if (Object.keys(update.$set).length) {
                 await db
-                    .collection('posts')
-                    .updateOne({ _id: post._id }, update);
+                    .collection('comments')
+                    .updateOne({ _id: comment._id }, update);
             }
         }
     },
