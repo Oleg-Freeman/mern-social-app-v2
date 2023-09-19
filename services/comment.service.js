@@ -26,12 +26,18 @@ const getAllCommentsByPostId = async ({ postId, skip = 0, limit = 100 }) => {
         .populate('likes user post');
 };
 
-const updateComment = async ({ id, data, user }) => {
+const findCommentById = async (id) => {
     const comment = await Comment.findById(id);
 
     if (!comment) {
         throw new CustomError(404, 'Comment not found');
     }
+
+    return comment;
+};
+
+const updateComment = async ({ id, data, user }) => {
+    const comment = await findCommentById(id);
 
     checkOwner(comment, user);
 
@@ -41,8 +47,18 @@ const updateComment = async ({ id, data, user }) => {
     });
 };
 
+const deleteComment = async ({ id, user }) => {
+    const comment = await findCommentById(id);
+
+    checkOwner(comment, user);
+
+    // TODO: delete likes
+    await Comment.findByIdAndDelete(id);
+};
+
 module.exports = {
     addComment,
     getAllCommentsByPostId,
     updateComment,
+    deleteComment,
 };

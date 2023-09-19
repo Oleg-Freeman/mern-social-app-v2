@@ -33,6 +33,7 @@ const getPostById = async (id) => {
     return post;
 };
 
+// TODO: delete likes and comments
 const deletePost = async (id, user) => {
     const post = await getPostById(id);
 
