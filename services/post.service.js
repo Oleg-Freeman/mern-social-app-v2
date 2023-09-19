@@ -1,5 +1,6 @@
 const Post = require('../models/post.model');
-const { CustomError } = require('../utils');
+const { CustomError, checkOwner } = require('../utils');
+
 const addPost = async (data, user) => {
     const post = await Post.create({ ...data, userId: user._id });
 
@@ -17,18 +18,12 @@ const getAllPosts = async ({ skip = 0, limit = 100 }) => {
         .populate({
             // TODO: nested pagination
             path: 'user comments likes',
-            populate: {
-                path: 'likes',
-            },
         });
 };
 
 const getPostById = async (id) => {
     const post = await Post.findById(id).populate({
-        path: 'comments likes',
-        populate: {
-            path: 'likes',
-        },
+        path: 'comments likes user',
     });
 
     if (!post) {
@@ -38,16 +33,10 @@ const getPostById = async (id) => {
     return post;
 };
 
-const checkPostOwner = (post, user) => {
-    return post.userId.toString() === user._id.toString();
-};
-
 const deletePost = async (id, user) => {
     const post = await getPostById(id);
 
-    if (!checkPostOwner(post, user)) {
-        throw new CustomError(403, 'Forbidden');
-    }
+    checkOwner(post, user);
 
     await Post.findByIdAndDelete(id);
 };
@@ -55,11 +44,12 @@ const deletePost = async (id, user) => {
 const updatePost = async (id, data, user) => {
     const post = await getPostById(id);
 
-    if (!checkPostOwner(post, user)) {
-        throw new CustomError(403, 'Forbidden');
-    }
+    checkOwner(post, user);
 
-    return Post.findByIdAndUpdate(id, data, { new: true });
+    return Post.findByIdAndUpdate(id, data, {
+        new: true,
+        populate: 'user comments likes',
+    });
 };
 
 module.exports = {

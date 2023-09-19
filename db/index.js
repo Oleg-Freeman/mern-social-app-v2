@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+// TODO: production DB migration
 
 function connect() {
     mongoose.connect(process.env.ATLAS_URI, {

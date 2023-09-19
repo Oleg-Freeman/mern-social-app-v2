@@ -7,6 +7,7 @@ const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 const {
     addComment,
     getAllCommentsByPostId,
+    updateComment,
 } = require('../services/comment.service');
 
 // Get all comments on post
@@ -32,11 +33,11 @@ router.post(
     validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
     async (req, res, next) => {
         try {
-            const comment = await addComment(
-                req.params.postId,
-                req.body,
-                req.user
-            );
+            const comment = await addComment({
+                postId: req.params.postId,
+                data: req.body,
+                user: req.user,
+            });
 
             res.status(201).json(comment);
         } catch (error) {
@@ -106,15 +107,13 @@ router.put(
     validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
     async (req, res, next) => {
         try {
-            await Comment.findOneAndUpdate(
-                { _id: req.params.commentId },
-                { body: req.body.body }
-            ).exec((err, comment) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (comment === null)
-                    return res.status(400).json('Comment not found');
-                else return res.json('Comment updated!');
+            const comment = await updateComment({
+                id: req.params.id,
+                user: req.user,
+                data: req.body,
             });
+
+            res.json(comment);
         } catch (error) {
             next(error);
         }

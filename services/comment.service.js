@@ -1,7 +1,8 @@
 const { getPostById } = require('./post.service');
 const Comment = require('../models/comment.model');
+const { CustomError, checkOwner } = require('../utils');
 
-const addComment = async (postId, data, user) => {
+const addComment = async ({ postId, data, user }) => {
     const post = await getPostById(postId);
     const comment = await Comment.create({
         ...data,
@@ -25,7 +26,23 @@ const getAllCommentsByPostId = async ({ postId, skip = 0, limit = 100 }) => {
         .populate('likes user post');
 };
 
+const updateComment = async ({ id, data, user }) => {
+    const comment = await Comment.findById(id);
+
+    if (!comment) {
+        throw new CustomError(404, 'Comment not found');
+    }
+
+    checkOwner(comment, user);
+
+    return Comment.findByIdAndUpdate(comment._id, data, {
+        new: true,
+        populate: 'user post likes',
+    });
+};
+
 module.exports = {
     addComment,
     getAllCommentsByPostId,
+    updateComment,
 };
