@@ -4,11 +4,13 @@ const { CustomError } = require('../utils');
 const jwt = require('jsonwebtoken');
 const { imageUploader } = require('../utils');
 
-const findAllUsers = async () => {
+const findAllUsers = async ({ skip = 0, limit = 100 }) => {
     return (
         User.find()
             .select('-password -__v -token')
             .sort({ createdAt: -1 })
+            .limit(+limit)
+            .skip(+skip)
             // TODO: test deep populate
             .populate({
                 path: 'posts comments likes',

@@ -4,22 +4,21 @@ const Post = require('../models/post.model');
 const { validateRequest, checkAuth } = require('../middlewares');
 const { postBodySchema, idSchema } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
-const { addComment } = require('../services/comment.service');
+const {
+    addComment,
+    getAllCommentsByPostId,
+} = require('../services/comment.service');
 
 // Get all comments on post
 router.get('/:postId', async (req, res, next) => {
     try {
-        await Comment.find({ postId: req.param.postId })
-            .sort({ createdAt: -1 })
-            .populate('likes')
-            .exec((err, comments) => {
-                if (err) return res.status(400).json('Error: ' + err);
-                else if (comments === null || comments.length === 0)
-                    return res
-                        .status(400)
-                        .json('No any comments on this post found');
-                else return res.json(comments);
-            });
+        const comments = await getAllCommentsByPostId({
+            postId: req.params.postId,
+            skip: req.query.skip,
+            limit: req.query.limit,
+        });
+
+        res.json(comments);
     } catch (error) {
         next(error);
     }

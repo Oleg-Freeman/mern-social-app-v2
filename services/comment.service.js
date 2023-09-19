@@ -15,6 +15,17 @@ const addComment = async (postId, data, user) => {
     });
 };
 
+const getAllCommentsByPostId = async ({ postId, skip = 0, limit = 100 }) => {
+    const post = await getPostById(postId);
+
+    return Comment.find({ postId: post._id })
+        .sort({ createdAt: -1 })
+        .limit(+limit)
+        .skip(+skip)
+        .populate('likes user post');
+};
+
 module.exports = {
     addComment,
+    getAllCommentsByPostId,
 };
