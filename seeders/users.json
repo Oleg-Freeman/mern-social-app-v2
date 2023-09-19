@@ -1,0 +1,17 @@
+[
+  {
+    "email": "test1@gmail.com",
+    "userName": "John Smith",
+    "password": "$2a$10$bdRsRl94w9u7HQj77JWMruxJ3XGcocXFGoPN1q53Ah14MPMcqc5nC"
+  },
+  {
+    "email": "test2@gmail.com",
+    "userName": "Jason Statham",
+    "password": "$2a$10$bdRsRl94w9u7HQj77JWMruxJ3XGcocXFGoPN1q53Ah14MPMcqc5nC"
+  },
+  {
+    "email": "test3@gmail.com",
+    "userName": "Chuck Norris",
+    "password": "$2a$10$bdRsRl94w9u7HQj77JWMruxJ3XGcocXFGoPN1q53Ah14MPMcqc5nC"
+  }
+]

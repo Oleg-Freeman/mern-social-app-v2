@@ -12,4 +12,10 @@ const upload = async (path) => {
     return imageURL;
 };
 
-module.exports = { upload };
+const deleteImage = async (imageURL) => {
+    const publicId = imageURL.split('/').pop().split('.')[0];
+
+    await cloudinary.uploader.destroy(publicId);
+};
+
+module.exports = { upload, deleteImage };

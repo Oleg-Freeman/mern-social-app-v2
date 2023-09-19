@@ -22,7 +22,7 @@ const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 // Get all users from DB
 router.get('/', async (req, res, next) => {
     try {
-        const users = await findAllUsers();
+        const users = await findAllUsers({});
 
         res.json(users);
     } catch (error) {
