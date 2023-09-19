@@ -4,6 +4,7 @@ const updateUserSchema = require('./update-user.schema');
 const idSchema = require('./id.schema');
 const postBodySchema = require('./post-body.schema');
 const paginationSchema = require('./pagination.schema');
+const likeSchema = require('./like.schema');
 
 module.exports = {
     registerUserSchema,
@@ -12,4 +13,5 @@ module.exports = {
     idSchema,
     postBodySchema,
     paginationSchema,
+    likeSchema,
 };

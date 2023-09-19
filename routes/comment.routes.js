@@ -28,7 +28,7 @@ router.get('/:postId', async (req, res, next) => {
 router.post(
     '/:postId',
     checkAuth,
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
     validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
     async (req, res, next) => {
         try {
@@ -49,7 +49,7 @@ router.post(
 router.delete(
     '/:id',
     checkAuth,
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
     async (req, res, next) => {
         try {
             await deleteComment({ id: req.params.id, user: req.user });
@@ -65,7 +65,7 @@ router.delete(
 router.put(
     '/:id',
     checkAuth,
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
     validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
     async (req, res, next) => {
         try {

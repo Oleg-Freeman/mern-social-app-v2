@@ -76,7 +76,7 @@ router.get('/logout', checkAuth, async (req, res, next) => {
 // Get one user by ID
 router.get(
     '/:id',
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
     async (req, res, next) => {
         try {
             const user = await findUserById(req.params.id);

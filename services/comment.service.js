@@ -61,4 +61,5 @@ module.exports = {
     getAllCommentsByPostId,
     updateComment,
     deleteComment,
+    findCommentById,
 };
