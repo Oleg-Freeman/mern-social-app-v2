@@ -1,5 +1,8 @@
 const Post = require('../models/post.model');
+const Comment = require('../models/comment.model');
+const Like = require('../models/like.model');
 const { CustomError, checkOwner } = require('../utils');
+const { LIKE_TYPES } = require('../constants');
 
 const addPost = async (data, user) => {
     const post = await Post.create({ ...data, userId: user._id });
@@ -33,13 +36,22 @@ const getPostById = async (id) => {
     return post;
 };
 
-// TODO: delete likes and comments
 const deletePost = async (id, user) => {
     const post = await getPostById(id);
 
     checkOwner(post, user);
 
     await Post.findByIdAndDelete(id);
+
+    const comments = await Comment.find({ postId: post._id });
+    const commentIds = comments.map((c) => c._id);
+
+    await Comment.deleteMany({ _id: { $in: commentIds } });
+    await Like.deleteMany({ postId: post._id, likeType: LIKE_TYPES.POST });
+    await Like.deleteMany({
+        commentId: { $in: commentIds },
+        likeType: LIKE_TYPES.COMMENT,
+    });
 };
 
 const updatePost = async (id, data, user) => {

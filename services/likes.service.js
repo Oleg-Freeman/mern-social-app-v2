@@ -1,7 +1,7 @@
 const Like = require('../models/like.model');
 const { getPostById } = require('./post.service');
 const { LIKE_TYPES } = require('../constants');
-const { findCommentById } = require('./comment.service');
+const { getCommentById } = require('./comment.service');
 const { CustomError } = require('../utils');
 const likePost = async ({ postId, user }) => {
     const post = await getPostById(postId);
@@ -29,7 +29,7 @@ const likePost = async ({ postId, user }) => {
 };
 
 const likeComment = async ({ commentId, user }) => {
-    const comment = await findCommentById(commentId);
+    const comment = await getCommentById(commentId);
     let like = await Like.findOne({
         userId: user._id,
         commentId: comment._id,

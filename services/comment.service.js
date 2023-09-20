@@ -1,6 +1,8 @@
 const { getPostById } = require('./post.service');
 const Comment = require('../models/comment.model');
+const Like = require('../models/like.model');
 const { CustomError, checkOwner } = require('../utils');
+const { LIKE_TYPES } = require('../constants');
 
 const addComment = async ({ postId, data, user }) => {
     const post = await getPostById(postId);
@@ -26,7 +28,7 @@ const getAllCommentsByPostId = async ({ postId, skip = 0, limit = 100 }) => {
         .populate('likes user post');
 };
 
-const findCommentById = async (id) => {
+const getCommentById = async (id) => {
     const comment = await Comment.findById(id);
 
     if (!comment) {
@@ -37,7 +39,7 @@ const findCommentById = async (id) => {
 };
 
 const updateComment = async ({ id, data, user }) => {
-    const comment = await findCommentById(id);
+    const comment = await getCommentById(id);
 
     checkOwner(comment, user);
 
@@ -48,12 +50,15 @@ const updateComment = async ({ id, data, user }) => {
 };
 
 const deleteComment = async ({ id, user }) => {
-    const comment = await findCommentById(id);
+    const comment = await getCommentById(id);
 
     checkOwner(comment, user);
 
-    // TODO: delete likes
     await Comment.findByIdAndDelete(id);
+    await Like.deleteMany({
+        commentId: comment._id,
+        likeType: LIKE_TYPES.COMMENT,
+    });
 };
 
 module.exports = {
@@ -61,5 +66,5 @@ module.exports = {
     getAllCommentsByPostId,
     updateComment,
     deleteComment,
-    findCommentById,
+    getCommentById,
 };

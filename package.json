@@ -17,8 +17,7 @@
     "lint": "./node_modules/.bin/eslint . --fix",
     "m:create": "./node_modules/migrate-mongo/bin/migrate-mongo.js create",
     "m:up": "./node_modules/migrate-mongo/bin/migrate-mongo.js up",
-    "m:down": "./node_modules/migrate-mongo/bin/migrate-mongo.js down",
-    "seed": "node ./seeders/index.js"
+    "m:down": "./node_modules/migrate-mongo/bin/migrate-mongo.js down"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.0",

@@ -1,4 +1,7 @@
 const User = require('../models/user.model');
+const Post = require('../models/post.model');
+const Comment = require('../models/comment.model');
+const Like = require('../models/like.model');
 const bcrypt = require('bcryptjs');
 const { CustomError } = require('../utils');
 const jwt = require('jsonwebtoken');
@@ -87,9 +90,24 @@ const findUserById = async (id) => {
     return user;
 };
 
-// TODO: delete all user related data
 const deleteUser = async (id) => {
+    const posts = await Post.find({ userId: id });
+    const postIds = posts.map((p) => p._id);
+    const comments = await Comment.find({
+        $or: [{ userId: id }, { postId: { $in: postIds } }],
+    });
+    const commentIds = comments.map((c) => c._id);
+
     await User.findByIdAndDelete(id);
+    await Post.deleteMany({ _id: { $in: postIds } });
+    await Comment.deleteMany({ _id: { $in: commentIds } });
+    await Like.deleteMany({
+        $or: [
+            { userId: id },
+            { postId: { $in: postIds } },
+            { commentId: { $in: commentIds } },
+        ],
+    });
 };
 
 const updateUser = async (user, data) => {
