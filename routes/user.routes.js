@@ -8,6 +8,7 @@ const {
     deleteUser,
     updateUser,
     uploadUserAvatar,
+    confirmUserEmail,
 } = require('../services/user.service');
 const { validateRequest, checkAuth, imageUpload } = require('../middlewares');
 const {
@@ -15,6 +16,7 @@ const {
     loginUserSchema,
     idSchema,
     updateUserSchema,
+    tokenSchema,
 } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 
@@ -38,7 +40,12 @@ router.post(
         const { email, password, userName } = req.body;
 
         try {
-            const user = await registerUser({ email, password, userName });
+            const user = await registerUser({
+                email,
+                password,
+                userName,
+                hostName: req.headers.host,
+            });
 
             res.status(201).json(user);
         } catch (error) {
@@ -76,7 +83,7 @@ router.get('/logout', checkAuth, async (req, res, next) => {
 // Get one user by ID
 router.get(
     '/:id',
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PARAM),
     async (req, res, next) => {
         try {
             const user = await findUserById(req.params.id);
@@ -125,6 +132,21 @@ router.patch(
             const updatedUser = await updateUser(req.user, req.body);
 
             res.json(updatedUser);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+// Confirm user email
+router.get(
+    '/confirm-email/:token',
+    validateRequest(tokenSchema, REQUEST_VALIDATION_TARGETS.PARAM),
+    async (req, res, next) => {
+        try {
+            await confirmUserEmail(req.params.token);
+
+            res.status(204).end();
         } catch (error) {
             next(error);
         }

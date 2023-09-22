@@ -1,8 +1,8 @@
 const REQUEST_VALIDATION_TARGETS = {
     BODY: 'body',
-    PATH: 'path',
+    PARAMS: 'params',
     QUERY: 'query',
-    ID: 'id',
+    PARAM: 'param',
 };
 
 module.exports = REQUEST_VALIDATION_TARGETS;

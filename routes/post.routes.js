@@ -44,7 +44,7 @@ router.post(
 // Get one post by ID
 router.get(
     '/:id',
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PARAM),
     async (req, res, next) => {
         try {
             const post = await getPostById(req.params.id);
@@ -60,7 +60,7 @@ router.get(
 router.delete(
     '/:id',
     checkAuth,
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PARAM),
     async (req, res, next) => {
         try {
             await deletePost(req.params.id, req.user);
@@ -76,7 +76,7 @@ router.delete(
 router.put(
     '/:id',
     checkAuth,
-    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.ID),
+    validateRequest(idSchema, REQUEST_VALIDATION_TARGETS.PARAM),
     validateRequest(postBodySchema, REQUEST_VALIDATION_TARGETS.BODY),
     async (req, res, next) => {
         try {

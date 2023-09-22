@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs');
 const { CustomError } = require('../utils');
 const jwt = require('jsonwebtoken');
 const { imageUploader } = require('../utils');
+const crypto = require('crypto');
+const dayjs = require('dayjs');
 
 const findAllUsers = async ({ skip = 0, limit = 100 }) => {
     return (
@@ -21,7 +23,7 @@ const findAllUsers = async ({ skip = 0, limit = 100 }) => {
     );
 };
 
-const registerUser = async ({ email, password, userName }) => {
+const registerUser = async ({ email, password, userName, hostName }) => {
     // Check if User Exists in DB
     const emailExist = await User.findOne({ email });
     if (emailExist) {
@@ -31,12 +33,34 @@ const registerUser = async ({ email, password, userName }) => {
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const emailVerificationToken = crypto.randomBytes(64).toString('base64url');
 
     const newUser = await User.create({
         email,
         password: hashedPassword,
         userName,
+        emailVerificationToken,
+        emailVerificationTokenIssuedAt: new Date(),
     });
+
+    // console.log(
+    //     `http://${hostName}/users/confirm-email/${emailVerificationToken}`
+    // );
+
+    // TODO: email are not delivered
+    // await mailer.sendEmail({
+    //     to: email,
+    //     subject: 'Verify your email address',
+    //     html: `
+    //         <h1>Verify your email address</h1>
+    //         <p>Hi ${userName},</p>
+    //         <p>Thanks for creating an account at Social App. Please verify your email address by clicking the link below.</p>
+    //         <a href="http://${hostName}/confirm-email/${emailVerificationToken}">Verify Email</a>
+    //         <p>If you did not create an account, no further action is required.</p>
+    //         <p>Regards,</p>
+    //         <p>Social App Team</p>
+    //     `,
+    // });
 
     return User.findById(newUser._id, '-password -__v');
 };
@@ -123,6 +147,28 @@ const uploadUserAvatar = async (user, file) => {
     await User.findOneAndUpdate({ _id: user._id }, { imageURL });
 };
 
+const confirmUserEmail = async (emailVerificationToken) => {
+    const user = await User.findOne({ emailVerificationToken });
+
+    if (!user) {
+        throw new CustomError(404, 'User not found');
+    }
+    if (dayjs().diff(user.emailVerificationTokenIssuedAt, 'hour') > 1) {
+        throw new CustomError(400, 'Token expired');
+    }
+    if (user.isVerified) {
+        throw new CustomError(400, 'Email already verified');
+    }
+
+    await User.findByIdAndUpdate(user._id, {
+        $set: { isVerified: true },
+        $unset: {
+            emailVerificationToken: 1,
+            emailVerificationTokenIssuedAt: 1,
+        },
+    });
+};
+
 module.exports = {
     findAllUsers,
     registerUser,
@@ -132,4 +178,5 @@ module.exports = {
     deleteUser,
     updateUser,
     uploadUserAvatar,
+    confirmUserEmail,
 };

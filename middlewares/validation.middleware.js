@@ -17,7 +17,7 @@ module.exports = (schema, target) => (req, res, next) => {
 
                 break;
             }
-            case REQUEST_VALIDATION_TARGETS.ID: {
+            case REQUEST_VALIDATION_TARGETS.PARAM: {
                 Object.values(req.params).forEach((value) => {
                     const { error } = schema.validate(value);
 
@@ -28,7 +28,7 @@ module.exports = (schema, target) => (req, res, next) => {
 
                 break;
             }
-            case REQUEST_VALIDATION_TARGETS.PATH: {
+            case REQUEST_VALIDATION_TARGETS.PARAMS: {
                 const { error } = schema.validate(req.params);
 
                 if (error) {

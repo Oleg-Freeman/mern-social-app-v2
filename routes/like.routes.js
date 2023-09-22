@@ -10,7 +10,7 @@ const { likeResource } = require('../services/likes.service');
 router.post(
     '/:likeType/:resourceId',
     checkAuth,
-    validateRequest(likeSchema, REQUEST_VALIDATION_TARGETS.PATH),
+    validateRequest(likeSchema, REQUEST_VALIDATION_TARGETS.PARAMS),
     async (req, res, next) => {
         try {
             const like = await likeResource({

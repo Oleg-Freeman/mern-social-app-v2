@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
     {
-        // TODO: add email verification
         email: {
             type: String,
             required: true,
@@ -31,6 +30,9 @@ const userSchema = new Schema(
         website: { type: String },
         location: { type: String },
         token: { type: String },
+        isVerified: { type: Boolean, default: false },
+        emailVerificationToken: { type: String },
+        emailVerificationTokenIssuedAt: { type: Date },
     },
     {
         timestamps: true,
