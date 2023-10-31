@@ -1,16 +1,52 @@
-const sgMail = require('@sendgrid/mail');
+const axios = require('axios');
+const { CustomError } = require('./custom-error');
+const removeHtmlTags = require('./remove-html-tags');
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const config = {
+    userName: process.env.MAILJET_API_KEY,
+    password: process.env.MAILJET_API_SECRET,
+    apiURL: 'https://api.mailjet.com/v3',
+    from: process.env.MAILJET_FROM_EMAIL,
+};
 
-const sendEmail = async ({ to, subject, html }) => {
-    const msg = {
-        to,
-        from: process.env.SENDGRID_FROM_EMAIL,
-        subject,
-        html,
-    };
+const sendEmail = async ({ to, subject, html, userName }) => {
+    try {
+        const response = await axios.post(
+            `${config.apiURL}/send`,
+            {
+                FromEmail: config.from,
+                FromName: 'Social App Team',
+                Sender: true,
+                Recipients: [
+                    {
+                        Email: to,
+                        Name: userName,
+                    },
+                ],
+                Subject: subject,
+                'Text-part': removeHtmlTags(html),
+                'Html-part': html,
+            },
+            {
+                auth: {
+                    username: config.userName,
+                    password: config.password,
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
 
-    await sgMail.send(msg);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+
+        throw new CustomError(
+            500,
+            error.message || error || 'Send email error'
+        );
+    }
 };
 
 module.exports = {

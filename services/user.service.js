@@ -3,11 +3,12 @@ const Post = require('../models/post.model');
 const Comment = require('../models/comment.model');
 const Like = require('../models/like.model');
 const bcrypt = require('bcryptjs');
-const { CustomError } = require('../utils');
+const { CustomError, mailer } = require('../utils');
 const jwt = require('jsonwebtoken');
 const { imageUploader } = require('../utils');
 const crypto = require('crypto');
 const dayjs = require('dayjs');
+const { getConfirmEmailTemplate } = require('../templates/emails');
 
 const findAllUsers = async ({ skip = 0, limit = 100 }) => {
     return (
@@ -33,8 +34,13 @@ const registerUser = async ({ email, password, userName, hostName }) => {
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const emailVerificationToken = crypto.randomBytes(64).toString('base64url');
 
+    const emailVerificationToken = crypto.randomBytes(64).toString('base64url');
+    const confirmEmail = getConfirmEmailTemplate(
+        userName,
+        hostName,
+        emailVerificationToken
+    );
     const newUser = await User.create({
         email,
         password: hashedPassword,
@@ -43,24 +49,12 @@ const registerUser = async ({ email, password, userName, hostName }) => {
         emailVerificationTokenIssuedAt: new Date(),
     });
 
-    // console.log(
-    //     `http://${hostName}/users/confirm-email/${emailVerificationToken}`
-    // );
-
-    // TODO: email are not delivered
-    // await mailer.sendEmail({
-    //     to: email,
-    //     subject: 'Verify your email address',
-    //     html: `
-    //         <h1>Verify your email address</h1>
-    //         <p>Hi ${userName},</p>
-    //         <p>Thanks for creating an account at Social App. Please verify your email address by clicking the link below.</p>
-    //         <a href="http://${hostName}/confirm-email/${emailVerificationToken}">Verify Email</a>
-    //         <p>If you did not create an account, no further action is required.</p>
-    //         <p>Regards,</p>
-    //         <p>Social App Team</p>
-    //     `,
-    // });
+    await mailer.sendEmail({
+        to: email,
+        subject: 'Verify your email address',
+        userName,
+        html: confirmEmail,
+    });
 
     return User.findById(newUser._id, '-password -__v');
 };
