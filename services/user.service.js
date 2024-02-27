@@ -41,7 +41,7 @@ const registerUser = async ({ email, password, userName, hostName }) => {
         hostName,
         emailVerificationToken
     );
-    const newUser = await User.create({
+    await User.create({
         email,
         password: hashedPassword,
         userName,
@@ -55,8 +55,6 @@ const registerUser = async ({ email, password, userName, hostName }) => {
         userName,
         html: confirmEmail,
     });
-
-    return User.findById(newUser._id, '-password -__v');
 };
 
 const loginUser = async ({ email, password }) => {

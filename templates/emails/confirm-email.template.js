@@ -56,7 +56,7 @@ function getConfirmEmailTemplate(userName, hostName, emailVerificationToken) {
 <h1>Verify your email address</h1>
 <p>Hi ${userName},</p>
 <p>Thanks for creating an account at Social App. Please verify your email address by clicking the link below.</p>
-<a href="http://${hostName}/confirm-email/${emailVerificationToken}"><button class="button-3" role="button">Verify Email</button></a>
+<a href="http://${hostName}/users/confirm-email/${emailVerificationToken}"><button class="button-3" role="button">Verify Email</button></a>
 <p>If you did not create an account, no further action is required.</p>
 <p>Regards,</p>
 <p>Social App Team</p>

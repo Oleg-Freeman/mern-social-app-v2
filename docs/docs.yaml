@@ -20,6 +20,34 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+  /users/register:
+    post:
+      summary: Register a new user
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: example@gmail.com
+                  required: true
+                userName:
+                  type: string
+                  example: JohnDoe
+                  required: true
+                password:
+                  type: string
+                  example: password
+                  required: true
+      responses:
+        204:
+          description: User created
+
 components:
   schemas:
     User:
@@ -97,6 +125,24 @@ components:
           type: string
           format: date-time
           example: 2021-09-25T18:00:14.000Z
+          required: false
+          nullable: true
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+          required: false
+          nullable: true
+        comments:
+          type: array
+          items:
+              $ref: '#/components/schemas/Comment'
+          required: false
+          nullable: true
+        likes:
+          type: array
+          items:
+              $ref: '#/components/schemas/Like'
           required: false
           nullable: true
     Post:

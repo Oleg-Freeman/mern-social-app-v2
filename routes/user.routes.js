@@ -21,7 +21,6 @@ const {
 } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 
-// TODO: add pagination
 // Get all users from DB
 router.get(
     '/',
@@ -45,14 +44,14 @@ router.post(
         const { email, password, userName } = req.body;
 
         try {
-            const user = await registerUser({
+            await registerUser({
                 email,
                 password,
                 userName,
                 hostName: req.headers.host,
             });
 
-            res.status(201).json(user);
+            res.status(204).end();
         } catch (error) {
             next(error);
         }
@@ -151,7 +150,8 @@ router.get(
         try {
             await confirmUserEmail(req.params.token);
 
-            res.status(204).end();
+            // TODO: redirect to frontend
+            res.status(200).json({ message: 'Email confirmed' });
         } catch (error) {
             next(error);
         }
