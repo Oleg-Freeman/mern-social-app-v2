@@ -17,20 +17,25 @@ const {
     idSchema,
     updateUserSchema,
     tokenSchema,
+    paginationSchema,
 } = require('../validation');
 const { REQUEST_VALIDATION_TARGETS } = require('../constants');
 
 // TODO: add pagination
 // Get all users from DB
-router.get('/', async (req, res, next) => {
-    try {
-        const users = await findAllUsers({});
+router.get(
+    '/',
+    validateRequest(paginationSchema, REQUEST_VALIDATION_TARGETS.QUERY),
+    async (req, res, next) => {
+        try {
+            const users = await findAllUsers(req.query);
 
-        res.json(users);
-    } catch (error) {
-        next(error);
+            res.json(users);
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
 
 // Register new user
 router.post(
