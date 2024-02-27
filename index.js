@@ -3,6 +3,8 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDb = require('./db');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 // .env config
 require('dotenv').config();
@@ -12,6 +14,19 @@ const port = process.env.PORT || 5000;
 
 // Connect DB
 connectDb();
+
+// Swagger configuration
+const swaggerDocs = swaggerJsDoc({
+    failOnErrors: true,
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Social App API',
+            version: '2.0.3',
+        },
+    },
+    apis: ['./docs/*.yaml'],
+});
 
 // Middlewares
 app.use(cors());
@@ -23,6 +38,7 @@ app.use('/users', require('./routes/user.routes'));
 app.use('/posts', require('./routes/post.routes'));
 app.use('/comments', require('./routes/comment.routes'));
 app.use('/likes', require('./routes/like.routes'));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;

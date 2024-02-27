@@ -1,0 +1,27 @@
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 614f3e2e0b7b208f8c5f8b3e
+          required: true
+        createdAt:
+          type: string
+          format: date-time
+          example: 2021-09-25T18:00:14.000Z
+          required: true
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2021-09-25T18:00:14.000Z
+          required: true
+        userId:
+          type: string
+          example: 614f3e2e0b7b208f8c5f8b3e
+          required: true
+        body:
+          type: string
+          example: This is a post
+          required: true
