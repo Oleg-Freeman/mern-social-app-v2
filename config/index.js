@@ -67,6 +67,14 @@ function getSwaggerJSDocConfig() {
     };
 }
 
+function getSwaggerUIConfig() {
+    return {
+        explorer: true,
+        customCssUrl:
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css',
+    };
+}
+
 module.exports = {
     getPort,
     getMongoUri,
@@ -75,4 +83,5 @@ module.exports = {
     getCloudinaryConfig,
     getMailJetConfig,
     getSwaggerJSDocConfig,
+    getSwaggerUIConfig,
 };

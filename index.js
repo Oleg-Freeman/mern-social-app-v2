@@ -29,7 +29,7 @@ app.use('/likes', require('./routes/like.routes'));
 app.use(
     '/docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerDocs, { explorer: true })
+    swaggerUi.setup(swaggerDocs, config.getSwaggerUIConfig())
 );
 
 app.use((error, req, res, next) => {
