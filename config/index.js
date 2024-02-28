@@ -70,8 +70,18 @@ function getSwaggerJSDocConfig() {
 function getSwaggerUIConfig() {
     return {
         explorer: true,
-        customCssUrl:
-            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css',
+        customSiteTitle: 'User Management API',
+        customfavIcon:
+            'https://avatars.githubusercontent.com/u/6936373?s=200&v=4',
+        customJs: [
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js',
+        ],
+        customCssUrl: [
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.css',
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css',
+        ],
     };
 }
 
