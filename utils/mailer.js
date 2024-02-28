@@ -1,13 +1,7 @@
 const axios = require('axios');
 const { CustomError } = require('./custom-error');
 const removeHtmlTags = require('./remove-html-tags');
-
-const config = {
-    userName: process.env.MAILJET_API_KEY,
-    password: process.env.MAILJET_API_SECRET,
-    apiURL: 'https://api.mailjet.com/v3',
-    from: process.env.MAILJET_FROM_EMAIL,
-};
+const config = require('../config').getMailJetConfig();
 
 const sendEmail = async ({ to, subject, html, userName }) => {
     try {

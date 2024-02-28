@@ -5,28 +5,16 @@ const bodyParser = require('body-parser');
 const connectDb = require('./db');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
-// .env config
-require('dotenv').config();
+const config = require('./config');
 
 // Port number configuration
-const port = process.env.PORT || 5000;
+const port = config.getPort();
 
 // Connect DB
-connectDb();
+connectDb(config.getMongoUri());
 
 // Swagger configuration
-const swaggerDocs = swaggerJsDoc({
-    failOnErrors: true,
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Social App API',
-            version: '2.0.3',
-        },
-    },
-    apis: ['./docs/*.yaml'],
-});
+const swaggerDocs = swaggerJsDoc(config.getSwaggerJSDocConfig());
 
 // Middlewares
 app.use(cors());
@@ -38,7 +26,11 @@ app.use('/users', require('./routes/user.routes'));
 app.use('/posts', require('./routes/post.routes'));
 app.use('/comments', require('./routes/comment.routes'));
 app.use('/likes', require('./routes/like.routes'));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use(
+    '/docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocs, { explorer: true })
+);
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;

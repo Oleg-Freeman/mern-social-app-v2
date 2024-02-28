@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const DB_MODELS = require('../constants/db-models');
+const config = require('../config');
 
 const Schema = mongoose.Schema;
 
@@ -24,7 +25,7 @@ const userSchema = new Schema(
         imageURL: {
             type: String,
             required: true,
-            default: process.env.DEFAULT_USER_AVATAR,
+            default: config.getDefaultUserAvatar(),
         },
         bio: { type: String },
         website: { type: String },

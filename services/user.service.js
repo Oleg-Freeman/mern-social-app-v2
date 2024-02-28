@@ -9,6 +9,7 @@ const { imageUploader } = require('../utils');
 const crypto = require('crypto');
 const dayjs = require('dayjs');
 const { getConfirmEmailTemplate } = require('../templates/emails');
+const config = require('../config');
 
 const findAllUsers = async ({ skip = 0, limit = 100 }) => {
     return (
@@ -70,8 +71,8 @@ const loginUser = async ({ email, password }) => {
         throw new CustomError(400, 'Wrong credentials, try again');
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: '1h',
+    const token = jwt.sign({ id: user._id }, config.getJwtSecret(), {
+        expiresIn: '1 day',
     });
 
     await User.updateOne({ _id: user._id }, { $set: { token } });
