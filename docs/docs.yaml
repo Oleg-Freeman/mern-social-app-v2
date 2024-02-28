@@ -2,7 +2,7 @@ paths:
   /users:
     get:
       summary: Get all users
-      tags: [Users]
+      tags: [ Users ]
       produces:
         - application/json
       parameters:
@@ -20,10 +20,59 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+    delete:
+      security:
+        - bearerAuth: [ ]
+      summary: Delete current user
+      tags: [ Users ]
+      responses:
+        204:
+          description: Users deleted
+    patch:
+      security:
+        - bearerAuth: [ ]
+      summary: Update current user profile
+      tags: [ Users ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bio:
+                  type: string
+                  example: I am a developer
+                  required: false
+                  nullable: true
+                website:
+                  type: string
+                  example: https://example.com
+                  required: false
+                  nullable: true
+                  format: uri
+                location:
+                  type: string
+                  example: New York
+                  required: false
+                  nullable: true
+                birthDay:
+                  type: string
+                  format: date
+                  example: 1990-01-01
+                  required: false
+                  nullable: true
+      responses:
+        200:
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
   /users/register:
     post:
       summary: Register a new user
-      tags: [Users]
+      tags: [ Users ]
       requestBody:
         required: true
         content:
@@ -42,11 +91,106 @@ paths:
                   required: true
                 password:
                   type: string
-                  example: password
+                  example: Qwerty1234.
                   required: true
       responses:
         204:
           description: User created
+  /users/login:
+    post:
+      summary: Login a user
+      tags: [ Users ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: example@gmail.com
+                  required: true
+                password:
+                  type: string
+                  example: Qwerty1234.
+                  required: true
+      responses:
+        200:
+          description: User logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/logout:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Logout a user
+      tags: [ Users ]
+      responses:
+        204:
+          description: User logged out
+  /users/{userId}:
+    get:
+      summary: Get a user by id
+      tags: [ Users ]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            example: 614f3e2e0b7b208f8c5f8b3e
+      responses:
+        200:
+          description: A user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/image:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Upload a user image
+      tags: [ Users ]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        204:
+          description: Image uploaded
+  /users/confirm-email/{token}:
+    get:
+      summary: Confirm user email
+      tags: [ Users ]
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+            example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      responses:
+        200:
+          description: Email confirmed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email confirmed
 
 components:
   schemas:
@@ -136,13 +280,13 @@ components:
         comments:
           type: array
           items:
-              $ref: '#/components/schemas/Comment'
+            $ref: '#/components/schemas/Comment'
           required: false
           nullable: true
         likes:
           type: array
           items:
-              $ref: '#/components/schemas/Like'
+            $ref: '#/components/schemas/Like'
           required: false
           nullable: true
     Post:
@@ -252,3 +396,8 @@ components:
           default: 100
           minimum: 1
           nullable: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
