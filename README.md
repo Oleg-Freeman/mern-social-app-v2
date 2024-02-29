@@ -26,4 +26,4 @@ npm start
 
 ## Documentation
 This project uses Swagger to document the API. 
-To access the documentation, run the project and access the URL `http://localhost:5000/docs`.
+To access the documentation, run the project and access the URL `http://localhost:{PORT}/docs`.
