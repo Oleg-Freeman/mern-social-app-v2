@@ -3,7 +3,6 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDb = require('./db');
-// const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const config = require('./config');
 const YAML = require('yamljs');
@@ -16,7 +15,6 @@ const port = config.getPort();
 connectDb(config.getMongoUri());
 
 // Swagger configuration
-// const swaggerDocs = swaggerJsDoc(config.getSwaggerJSDocConfig());
 const swaggerJSDocs = YAML.load(path.join(__dirname, 'docs', 'docs.yaml'));
 
 // Middlewares

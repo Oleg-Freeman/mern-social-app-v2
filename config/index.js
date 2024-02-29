@@ -45,35 +45,17 @@ function getMailJetConfig() {
     };
 }
 
-function getSwaggerJSDocConfig() {
-    return {
-        failOnErrors: true,
-        definition: {
-            openapi: '3.1.0',
-            info: {
-                title: 'Social App API',
-                version: '2.0.3',
-                license: {
-                    name: 'MIT',
-                    url: 'https://spdx.org/licenses/MIT.html',
-                },
-                contact: {
-                    name: 'Oleg Voitiuk',
-                    url: 'https://www.linkedin.com/in/olegv999/',
-                },
-            },
-        },
-        apis: ['./docs/docs.yaml'],
-        // NestJs app works as expected
-        // But it is not using jsdoc
-    };
-}
-
 function getSwaggerUIConfig() {
     return {
         customSiteTitle: 'User Management API',
-        customCssUrl:
+        customCssUrl: [
             'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css',
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.css',
+        ],
+        customJs: [
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui-bundle.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui-standalone-preset.min.js',
+        ],
     };
 }
 
@@ -84,6 +66,5 @@ module.exports = {
     getDefaultUserAvatar,
     getCloudinaryConfig,
     getMailJetConfig,
-    getSwaggerJSDocConfig,
     getSwaggerUIConfig,
 };
