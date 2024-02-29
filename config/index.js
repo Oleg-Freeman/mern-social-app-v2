@@ -63,13 +63,14 @@ function getSwaggerJSDocConfig() {
                 },
             },
         },
-        apis: ['./docs/*.yaml'],
+        apis: ['./docs/docs.yaml'],
+        // NestJs app works as expected
+        // But it is not using jsdoc
     };
 }
 
 function getSwaggerUIConfig() {
     return {
-        explorer: true,
         customSiteTitle: 'User Management API',
         customCssUrl:
             'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css',

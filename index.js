@@ -3,9 +3,11 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDb = require('./db');
-const swaggerJsDoc = require('swagger-jsdoc');
+// const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const config = require('./config');
+const YAML = require('yamljs');
+const swaggerJSDocs = YAML.load('./docs/docs.yaml');
 
 // Port number configuration
 const port = config.getPort();
@@ -14,7 +16,7 @@ const port = config.getPort();
 connectDb(config.getMongoUri());
 
 // Swagger configuration
-const swaggerDocs = swaggerJsDoc(config.getSwaggerJSDocConfig());
+// const swaggerDocs = swaggerJsDoc(config.getSwaggerJSDocConfig());
 
 // Middlewares
 app.use(cors());
@@ -29,7 +31,7 @@ app.use('/likes', require('./routes/like.routes'));
 app.use(
     '/docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerDocs, config.getSwaggerUIConfig())
+    swaggerUi.setup(swaggerJSDocs, config.getSwaggerUIConfig())
 );
 
 app.use((error, req, res, next) => {
