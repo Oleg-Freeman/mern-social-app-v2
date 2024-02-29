@@ -7,7 +7,7 @@ const connectDb = require('./db');
 const swaggerUi = require('swagger-ui-express');
 const config = require('./config');
 const YAML = require('yamljs');
-const swaggerJSDocs = YAML.load('./docs/docs.yaml');
+const path = require('path');
 
 // Port number configuration
 const port = config.getPort();
@@ -17,6 +17,7 @@ connectDb(config.getMongoUri());
 
 // Swagger configuration
 // const swaggerDocs = swaggerJsDoc(config.getSwaggerJSDocConfig());
+const swaggerJSDocs = YAML.load(path.join(__dirname, 'docs', 'docs.yaml'));
 
 // Middlewares
 app.use(cors());
