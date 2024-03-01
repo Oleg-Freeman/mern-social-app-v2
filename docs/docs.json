@@ -17,6 +17,10 @@
     {
       "url": "https://social-app-back-end-five.vercel.app",
       "description": "Vercel server"
+    },
+    {
+      "url": "http://localhost:5000",
+      "description": "Local server"
     }
   ],
   "paths": {
@@ -336,6 +340,177 @@
           }
         }
       }
+    },
+    "/posts": {
+      "get": {
+        "summary": "Get all posts",
+        "tags": [
+          "Posts"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "PaginationParams",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/params/Pagination"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Post"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a new post",
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/params/PostBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/{id}": {
+      "get": {
+        "summary": "Get a post by id",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "614f3e2e0b7b208f8c5f8b3e"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A post",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete a post by id",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "614f3e2e0b7b208f8c5f8b3e"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Post deleted"
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update a post by id",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "614f3e2e0b7b208f8c5f8b3e"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/params/PostBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated post",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -486,6 +661,25 @@
             "type": "string",
             "example": "This is a post",
             "required": true
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            },
+            "required": false,
+            "nullable": true
+          },
+          "likes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Like"
+            },
+            "required": false,
+            "nullable": true
           }
         }
       },
@@ -591,6 +785,16 @@
             "default": 100,
             "minimum": 1,
             "nullable": true
+          }
+        }
+      },
+      "PostBody": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "example": "This is a post",
+            "required": true
           }
         }
       }

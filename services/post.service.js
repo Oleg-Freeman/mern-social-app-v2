@@ -21,12 +21,14 @@ const getAllPosts = async ({ skip = 0, limit = 100 }) => {
         .populate({
             // TODO: nested pagination
             path: 'user comments likes',
+            select: '-password -__v -token',
         });
 };
 
 const getPostById = async (id) => {
     const post = await Post.findById(id).populate({
         path: 'comments likes user',
+        select: '-password -__v -token',
     });
 
     if (!post) {
@@ -59,9 +61,11 @@ const updatePost = async (id, data, user) => {
 
     checkOwner(post, user);
 
-    return Post.findByIdAndUpdate(id, data, {
-        new: true,
-        populate: 'user comments likes',
+    await Post.findByIdAndUpdate(id, data);
+
+    return Post.findById(id).populate({
+        path: 'comments likes user',
+        select: '-password -__v -token',
     });
 };
 
