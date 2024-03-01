@@ -11,12 +11,14 @@
 <div id="swagger-ui"></div>
 <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
 <script>
-    window.onload = () => {
-        window.ui = SwaggerUIBundle({
-            url: 'https://petstore3.swagger.io/api/v3/openapi.json',
-            dom_id: '#swagger-ui',
+    fetch('docs.json')
+        .then(res => res.json())
+        .then(spec => {
+            window.ui = SwaggerUIBundle({
+                spec: spec,
+                dom_id: '#swagger-ui',
+            });
         });
-    };
 </script>
 </body>
 </html>

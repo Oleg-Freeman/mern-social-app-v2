@@ -3,19 +3,13 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDb = require('./db');
-const swaggerUi = require('swagger-ui-express');
 const config = require('./config');
-const YAML = require('yamljs');
-const path = require('path');
 
 // Port number configuration
 const port = config.getPort();
 
 // Connect DB
 connectDb(config.getMongoUri());
-
-// Swagger configuration
-const swaggerJSDocs = YAML.load(path.join(__dirname, 'docs', 'docs.yaml'));
 
 // Middlewares
 app.use(cors());
@@ -27,11 +21,6 @@ app.use('/users', require('./routes/user.routes'));
 app.use('/posts', require('./routes/post.routes'));
 app.use('/comments', require('./routes/comment.routes'));
 app.use('/likes', require('./routes/like.routes'));
-app.use(
-    '/docs',
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerJSDocs, config.getSwaggerUIConfig())
-);
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;
