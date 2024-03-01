@@ -14,7 +14,7 @@ const addComment = async ({ postId, data, user }) => {
 
     return Comment.findById(comment._id).populate({
         path: 'user post',
-        select: '-password -__v',
+        select: '-password -__v -token',
     });
 };
 
@@ -25,7 +25,10 @@ const getAllCommentsByPostId = async ({ postId, skip = 0, limit = 100 }) => {
         .sort({ createdAt: -1 })
         .limit(+limit)
         .skip(+skip)
-        .populate('likes user post');
+        .populate({
+            path: 'user post likes',
+            select: '-password -__v -token',
+        });
 };
 
 const getCommentById = async (id) => {
@@ -43,9 +46,11 @@ const updateComment = async ({ id, data, user }) => {
 
     checkOwner(comment, user);
 
-    return Comment.findByIdAndUpdate(comment._id, data, {
-        new: true,
-        populate: 'user post likes',
+    await Comment.findByIdAndUpdate(comment._id, data);
+
+    return Comment.findById(comment._id).populate({
+        path: 'user post likes',
+        select: '-password -__v -token',
     });
 };
 
