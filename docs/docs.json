@@ -687,6 +687,58 @@
           }
         }
       }
+    },
+    "/likes/{likeType}/{resourceId}": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Like a post or a comment",
+        "tags": [
+          "Likes"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "likeType",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "post",
+              "enum": [
+                "post",
+                "comment"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "resourceId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "614f3e2e0b7b208f8c5f8b3e"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Unliked"
+          },
+          "201": {
+            "description": "Liked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Like"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

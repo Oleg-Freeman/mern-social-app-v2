@@ -25,6 +25,7 @@ const likePost = async ({ postId, user }) => {
 
     return Like.findById(like._id).populate({
         path: 'user post',
+        select: '-password -__v -token',
     });
 };
 
@@ -50,6 +51,7 @@ const likeComment = async ({ commentId, user }) => {
 
     return Like.findById(like._id).populate({
         path: 'user comment',
+        select: '-password -__v -token',
     });
 };
 
